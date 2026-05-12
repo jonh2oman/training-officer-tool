@@ -1,4 +1,4 @@
-import '../domain/training_session.dart';
+import '../../calendar/domain/training_session.dart';
 
 class Lesson {
   final String code;
