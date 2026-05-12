@@ -20,7 +20,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => LessonSelectorSheet(
         phase: phase,
-        onSelected: (lesson, instructor, instructorId, location) {
+        onSelected: (lesson, instructor, instructorId, location, locationId) {
           ref.read(trainingProvider.notifier).assignLesson(
                 sessionId,
                 phase,
@@ -31,6 +31,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
                   instructor: instructor.isEmpty ? null : instructor,
                   instructorId: instructorId,
                   location: location.isEmpty ? null : location,
+                  locationId: locationId,
                 ),
               );
         },
@@ -131,7 +132,8 @@ class PlanningMatrixScreen extends ConsumerWidget {
           Expanded(
             child: _LessonSlotCard(
               slot: session.matrix[phase]![periodIndex],
-              hasConflict: _checkForConflict(session, periodIndex, phase),
+              instructorConflict: _checkForInstructorConflict(session, periodIndex, phase),
+              locationConflict: _checkForLocationConflict(session, periodIndex, phase),
               onTap: () => _showLessonSelector(context, ref, phase, periodIndex),
             ),
           ),
@@ -139,14 +141,26 @@ class PlanningMatrixScreen extends ConsumerWidget {
     );
   }
 
-  bool _checkForConflict(TrainingSession session, int periodIndex, Phase currentPhase) {
+  bool _checkForInstructorConflict(TrainingSession session, int periodIndex, Phase currentPhase) {
     final currentInstructorId = session.matrix[currentPhase]![periodIndex].instructorId;
     if (currentInstructorId == null) return false;
 
-    // Check all OTHER phases in the SAME period
     for (var phase in Phase.values) {
       if (phase == currentPhase) continue;
       if (session.matrix[phase]![periodIndex].instructorId == currentInstructorId) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool _checkForLocationConflict(TrainingSession session, int periodIndex, Phase currentPhase) {
+    final currentLocationId = session.matrix[currentPhase]![periodIndex].locationId;
+    if (currentLocationId == null) return false;
+
+    for (var phase in Phase.values) {
+      if (phase == currentPhase) continue;
+      if (session.matrix[phase]![periodIndex].locationId == currentLocationId) {
         return true;
       }
     }
@@ -164,10 +178,16 @@ class PlanningMatrixScreen extends ConsumerWidget {
 
 class _LessonSlotCard extends StatelessWidget {
   final LessonSlot slot;
-  final bool hasConflict;
+  final bool instructorConflict;
+  final bool locationConflict;
   final VoidCallback onTap;
 
-  const _LessonSlotCard({required this.slot, this.hasConflict = false, required this.onTap});
+  const _LessonSlotCard({
+    required this.slot,
+    this.instructorConflict = false,
+    this.locationConflict = false,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -203,10 +223,16 @@ class _LessonSlotCard extends StatelessWidget {
                           slot.eoCode ?? '',
                           style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.gold),
                         ),
-                        if (hasConflict)
-                          const Tooltip(
-                            message: 'Instructor Conflict!',
-                            child: Icon(LucideIcons.alertTriangle, size: 12, color: Colors.redAccent),
+                        if (instructorConflict || locationConflict)
+                          Tooltip(
+                            message: instructorConflict 
+                                ? 'Instructor Conflict!' 
+                                : 'Location Conflict!',
+                            child: Icon(
+                              LucideIcons.alertTriangle, 
+                              size: 12, 
+                              color: instructorConflict ? Colors.redAccent : Colors.orangeAccent
+                            ),
                           ),
                       ],
                     ),

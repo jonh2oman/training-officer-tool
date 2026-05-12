@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/calendar/presentation/academic_calendar_screen.dart';
 import '../features/instructors/presentation/instructor_registry_screen.dart';
+import '../features/locations/presentation/location_registry_screen.dart';
 
 import '../features/calendar/presentation/planning_matrix_screen.dart';
 
@@ -23,6 +24,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/instructors',
         builder: (context, state) => const InstructorRegistryScreen(),
+      ),
+      GoRoute(
+        path: '/locations',
+        builder: (context, state) => const LocationRegistryScreen(),
       ),
     ],
   );

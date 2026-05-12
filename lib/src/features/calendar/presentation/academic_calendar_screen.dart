@@ -122,6 +122,11 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
             tooltip: 'Instructor Registry',
           ),
           IconButton(
+            icon: const Icon(LucideIcons.map),
+            onPressed: () => context.push('/locations'),
+            tooltip: 'Location Registry',
+          ),
+          IconButton(
             icon: const Icon(LucideIcons.fileText),
             onPressed: () {}, // Future PDF
           ),

@@ -21,7 +21,8 @@ class LessonSlot {
   final String? title;
   final String? instructor; // Kept for display/legacy
   final String? instructorId; // Linked to Instructor Registry
-  final String? location;
+  final String? location; // Kept for display/legacy
+  final String? locationId; // Linked to Location Registry
 
   const LessonSlot({
     this.eoCode,
@@ -29,6 +30,7 @@ class LessonSlot {
     this.instructor,
     this.instructorId,
     this.location,
+    this.locationId,
   });
 
   bool get isEmpty => eoCode == null && title == null;
@@ -39,6 +41,7 @@ class LessonSlot {
     'instructor': instructor,
     'instructorId': instructorId,
     'location': location,
+    'locationId': locationId,
   };
 
   factory LessonSlot.fromJson(Map<String, dynamic> json) => LessonSlot(
@@ -47,6 +50,7 @@ class LessonSlot {
     instructor: json['instructor'],
     instructorId: json['instructorId'],
     location: json['location'],
+    locationId: json['locationId'],
   );
 }
 

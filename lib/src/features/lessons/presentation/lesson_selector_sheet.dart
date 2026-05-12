@@ -4,6 +4,8 @@ import '../domain/lesson.dart';
 import '../../calendar/domain/training_session.dart';
 import '../../instructors/domain/instructor.dart';
 import '../../instructors/application/instructor_controller.dart';
+import '../../locations/domain/location.dart';
+import '../../locations/application/location_controller.dart';
 import '../../../theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../calendar/application/training_controller.dart';
@@ -11,7 +13,7 @@ import 'package:intl/intl.dart';
 
 class LessonSelectorSheet extends ConsumerStatefulWidget {
   final Phase phase;
-  final Function(Lesson lesson, String instructor, String? instructorId, String location) onSelected;
+  final Function(Lesson lesson, String instructor, String? instructorId, String location, String? locationId) onSelected;
 
   const LessonSelectorSheet({
     super.key,
@@ -75,7 +77,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
                   lesson: lesson,
                   plannedDates: plannedDates,
                   onTap: () {
-                    widget.onSelected(lesson, _instructorName, _selectedInstructorId, _location);
+                    widget.onSelected(lesson, _instructorName, _selectedInstructorId, _locationName, _selectedLocationId);
                     Navigator.pop(context);
                   },
                 );
@@ -197,7 +199,8 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
 
   String _instructorName = '';
   String? _selectedInstructorId;
-  String _location = '';
+  String _locationName = '';
+  String? _selectedLocationId;
 
   Widget _buildSmallField(String hint, IconData icon, Function(String) onChanged) {
     if (hint == 'Instructor') {
@@ -237,6 +240,45 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
         ),
       );
     }
+    
+    if (hint == 'Location') {
+      final locations = ref.watch(locationProvider);
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            isExpanded: true,
+            hint: Row(
+              children: [
+                Icon(icon, size: 14, color: Colors.white38),
+                const SizedBox(width: 8),
+                Text(hint, style: const TextStyle(fontSize: 12, color: Colors.white38)),
+              ],
+            ),
+            value: _selectedLocationId,
+            dropdownColor: AppTheme.black,
+            items: locations.map((l) => DropdownMenuItem(
+              value: l.id,
+              child: Text(l.name, style: const TextStyle(fontSize: 12)),
+            )).toList(),
+            onChanged: (val) {
+              if (val != null) {
+                final location = locations.firstWhere((l) => l.id == val);
+                setState(() {
+                  _selectedLocationId = val;
+                  _locationName = location.name;
+                });
+              }
+            },
+          ),
+        ),
+      );
+    }
+
     return TextField(
       onChanged: onChanged,
       style: const TextStyle(fontSize: 12),
