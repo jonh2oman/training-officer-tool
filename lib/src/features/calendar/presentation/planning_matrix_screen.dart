@@ -45,19 +45,27 @@ class PlanningMatrixScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(LucideIcons.chevronLeft, color: Colors.white),
+          onPressed: () => context.pop(),
+        ),
         title: Column(
           children: [
-            Text(DateFormat('dd MMMM yyyy').format(session.date).toUpperCase()),
             Text(
-              'PARADE NIGHT PLANNING',
-              style: TextStyle(fontSize: 10, color: AppTheme.gold.withOpacity(0.7), letterSpacing: 2),
+              DateFormat('EEEE, MMM d, yyyy').format(session.date).toUpperCase(),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            Text(
+              _getTypeLabel(session.type).toUpperCase(),
+              style: TextStyle(
+                fontSize: 10,
+                color: AppTheme.gold.withOpacity(0.7),
+                letterSpacing: 2,
+              ),
             ),
           ],
         ),
-        leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft),
-          onPressed: () => context.pop(),
-        ),
+        centerTitle: true,
       ),
       body: Column(
         children: [
@@ -124,6 +132,15 @@ class PlanningMatrixScreen extends ConsumerWidget {
           ),
       ],
     );
+  }
+}
+
+  String _getTypeLabel(SessionType type) {
+    switch (type) {
+      case SessionType.paradeNight: return 'Parade Night';
+      case SessionType.trainingDay: return 'Training Day';
+      case SessionType.weekend: return 'Weekend';
+    }
   }
 }
 
