@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/gestures.dart';
 import '../application/training_controller.dart';
 import '../domain/training_session.dart';
 import '../../../theme/app_theme.dart';
@@ -30,21 +31,44 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
       groupedSessions.putIfAbsent(monthName, () => []).add(session);
     }
 
+    if (trainingState.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Column(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'ACADEMIC YEAR 2026-2027',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'SEA CADET CORPS PLANNING',
-              style: TextStyle(
-                fontSize: 10,
-                color: AppTheme.gold.withOpacity(0.7),
-                letterSpacing: 2,
-              ),
+            Column(
+              children: [
+                DropdownButton<int>(
+                  value: trainingState.academicYear,
+                  dropdownColor: AppTheme.black,
+                  underline: const SizedBox(),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                  icon: const Icon(LucideIcons.chevronDown, size: 16, color: AppTheme.gold),
+                  onChanged: (year) {
+                    if (year != null) {
+                      ref.read(trainingProvider.notifier).setAcademicYear(year);
+                    }
+                  },
+                  items: [2024, 2025, 2026, 2027, 2028].map((year) {
+                    return DropdownMenuItem(
+                      value: year,
+                      child: Text('ACADEMIC YEAR $year-${year + 1}'),
+                    );
+                  }).toList(),
+                ),
+                Text(
+                  'SEA CADET CORPS PLANNING',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: AppTheme.gold.withOpacity(0.7),
+                    letterSpacing: 2,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -200,40 +224,55 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
   }
 
   Widget _buildBoardView(Map<String, List<TrainingSession>> groupedSessions) {
-    return ListView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.all(24),
-      children: groupedSessions.entries.map((entry) {
-        return Container(
-          width: 320,
-          margin: const EdgeInsets.only(right: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppTheme.gold.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  entry.key.toUpperCase(),
-                  style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2, color: AppTheme.gold, fontSize: 12),
-                ),
+    final scrollController = ScrollController();
+    
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(
+        dragDevices: {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.mouse,
+        },
+      ),
+      child: Scrollbar(
+        controller: scrollController,
+        thumbVisibility: true,
+        child: ListView(
+          controller: scrollController,
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.all(24),
+          children: groupedSessions.entries.map((entry) {
+            return Container(
+              width: 320,
+              margin: const EdgeInsets.only(right: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.gold.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      entry.key.toUpperCase(),
+                      style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2, color: AppTheme.gold, fontSize: 12),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Expanded(
+                    child: ListView(
+                      children: entry.value.map((s) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _SessionCard(session: s),
+                      )).toList(),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: ListView(
-                  children: entry.value.map((s) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _SessionCard(session: s),
-                  )).toList(),
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 }

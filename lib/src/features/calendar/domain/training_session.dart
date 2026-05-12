@@ -30,6 +30,20 @@ class LessonSlot {
   });
 
   bool get isEmpty => eoCode == null && title == null;
+
+  Map<String, dynamic> toJson() => {
+    'eoCode': eoCode,
+    'title': title,
+    'instructor': instructor,
+    'location': location,
+  };
+
+  factory LessonSlot.fromJson(Map<String, dynamic> json) => LessonSlot(
+    eoCode: json['eoCode'],
+    title: json['title'],
+    instructor: json['instructor'],
+    location: json['location'],
+  );
 }
 
 class TrainingSession {
@@ -65,6 +79,29 @@ class TrainingSession {
       type: type ?? this.type,
       description: description ?? this.description,
       matrix: matrix ?? this.matrix,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'date': date.toIso8601String(),
+    'type': type.name,
+    'description': description,
+    'matrix': matrix.map((key, value) => MapEntry(key.name, value.map((e) => e.toJson()).toList())),
+  };
+
+  factory TrainingSession.fromJson(Map<String, dynamic> json) {
+    return TrainingSession(
+      id: json['id'],
+      date: DateTime.parse(json['date']),
+      type: SessionType.values.byName(json['type']),
+      description: json['description'],
+      matrix: (json['matrix'] as Map<String, dynamic>).map(
+        (key, value) => MapEntry(
+          Phase.values.byName(key),
+          (value as List).map((e) => LessonSlot.fromJson(e)).toList(),
+        ),
+      ),
     );
   }
 }
