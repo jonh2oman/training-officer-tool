@@ -60,13 +60,34 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
                     );
                   }).toList(),
                 ),
-                Text(
-                  'SEA CADET CORPS PLANNING',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: AppTheme.gold.withOpacity(0.7),
-                    letterSpacing: 2,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'CORPS PARADES ON: ',
+                      style: TextStyle(fontSize: 8, color: AppTheme.gold.withOpacity(0.5), letterSpacing: 1),
+                    ),
+                    DropdownButton<int>(
+                      value: trainingState.paradeWeekday,
+                      dropdownColor: AppTheme.black,
+                      underline: const SizedBox(),
+                      dense: true,
+                      style: const TextStyle(color: AppTheme.gold, fontWeight: FontWeight.bold, fontSize: 10),
+                      onChanged: (day) {
+                        if (day != null) {
+                          ref.read(trainingProvider.notifier).setParadeWeekday(day);
+                        }
+                      },
+                      items: [
+                        const DropdownMenuItem(value: 1, child: Text('MONDAY')),
+                        const DropdownMenuItem(value: 2, child: Text('TUESDAY')),
+                        const DropdownMenuItem(value: 3, child: Text('WEDNESDAY')),
+                        const DropdownMenuItem(value: 4, child: Text('THURSDAY')),
+                        const DropdownMenuItem(value: 5, child: Text('FRIDAY')),
+                        const DropdownMenuItem(value: 6, child: Text('SATURDAY')),
+                        const DropdownMenuItem(value: 7, child: Text('SUNDAY')),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -101,7 +122,56 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
       ),
       body: _buildCurrentView(trainingState, groupedSessions),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {}, // Add special day (Day Mode / Weekend)
+        onPressed: () async {
+          final DateTime? picked = await showDatePicker(
+            context: context,
+            initialDate: DateTime(trainingState.academicYear, 9, 1),
+            firstDate: DateTime(trainingState.academicYear, 9, 1),
+            lastDate: DateTime(trainingState.academicYear + 1, 6, 30),
+            builder: (context, child) {
+              return Theme(
+                data: Theme.of(context).copyWith(
+                  colorScheme: const ColorScheme.dark(
+                    primary: AppTheme.gold,
+                    onPrimary: AppTheme.black,
+                    surface: AppTheme.black,
+                    onSurface: Colors.white,
+                  ),
+                ),
+                child: child!,
+              );
+            },
+          );
+
+          if (picked != null && mounted) {
+            final type = await showDialog<SessionType>(
+              context: context,
+              builder: (context) => AlertDialog(
+                backgroundColor: AppTheme.black,
+                title: const Text('SESSION TYPE', style: TextStyle(color: AppTheme.gold)),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: const Icon(LucideIcons.sun, color: AppTheme.dayColor),
+                      title: const Text('TRAINING DAY'),
+                      onTap: () => Navigator.pop(context, SessionType.trainingDay),
+                    ),
+                    ListTile(
+                      leading: const Icon(LucideIcons.tent, color: AppTheme.weekendColor),
+                      title: const Text('WEEKEND EXERCISE'),
+                      onTap: () => Navigator.pop(context, SessionType.weekend),
+                    ),
+                  ],
+                ),
+              ),
+            );
+
+            if (type != null) {
+              ref.read(trainingProvider.notifier).addAdHocSession(picked, type);
+            }
+          }
+        },
         icon: const Icon(LucideIcons.plus),
         label: const Text('ADD TRAINING DAY'),
         backgroundColor: AppTheme.gold,
@@ -198,7 +268,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
             final session = dateMap[date];
 
             return InkWell(
-              onTap: session != null ? () => context.go('/planning/${session.id}') : null,
+              onTap: session != null ? () => context.push('/planning/${session.id}') : null,
               child: Container(
                 decoration: BoxDecoration(
                   color: session != null ? AppTheme.navy : Colors.white.withOpacity(0.02),
@@ -306,7 +376,7 @@ class _SessionCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => context.go('/planning/${session.id}'),
+        onTap: () => context.push('/planning/${session.id}'),
         borderRadius: BorderRadius.circular(24),
         child: Padding(
           padding: const EdgeInsets.all(16.0),

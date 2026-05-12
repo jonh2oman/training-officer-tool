@@ -5,22 +5,26 @@ import 'training_storage.dart';
 class TrainingState {
   final List<TrainingSession> sessions;
   final int academicYear;
+  final int paradeWeekday; // 1 = Monday, 7 = Sunday
   final bool isLoading;
 
   TrainingState({
     this.sessions = const [],
     this.academicYear = 2026,
+    this.paradeWeekday = 2, // Default to Tuesday
     this.isLoading = false,
   });
 
   TrainingState copyWith({
     List<TrainingSession>? sessions,
     int? academicYear,
+    int? paradeWeekday,
     bool? isLoading,
   }) {
     return TrainingState(
       sessions: sessions ?? this.sessions,
       academicYear: academicYear ?? this.academicYear,
+      paradeWeekday: paradeWeekday ?? this.paradeWeekday,
       isLoading: isLoading ?? this.isLoading,
     );
   }
@@ -36,16 +40,22 @@ class TrainingController extends StateNotifier<TrainingState> {
     final savedSessions = await TrainingStorage.loadSessions();
     
     if (savedSessions != null && savedSessions.isNotEmpty) {
-      // Find the most recent year from saved sessions or stick to 2026
-      final year = savedSessions.first.date.month >= 9 ? savedSessions.first.date.year : savedSessions.first.date.year - 1;
-      state = state.copyWith(sessions: savedSessions, academicYear: year, isLoading: false);
+      // Find the most recent year and weekday from saved sessions
+      final first = savedSessions.first;
+      final year = first.date.month >= 9 ? first.date.year : first.date.year - 1;
+      state = state.copyWith(
+        sessions: savedSessions, 
+        academicYear: year, 
+        paradeWeekday: first.date.weekday,
+        isLoading: false,
+      );
     } else {
-      _initializeYear(state.academicYear);
+      _initializeYear(state.academicYear, state.paradeWeekday);
       state = state.copyWith(isLoading: false);
     }
   }
 
-  void _initializeYear(int startYear) {
+  void _initializeYear(int startYear, int weekday) {
     final startDate = DateTime(startYear, 9, 1);
     final endDate = DateTime(startYear + 1, 6, 30);
 
@@ -53,18 +63,29 @@ class TrainingController extends StateNotifier<TrainingState> {
     DateTime current = startDate;
 
     while (current.isBefore(endDate)) {
-      if (current.weekday == DateTime.tuesday) {
+      if (current.weekday == weekday) {
         sessions.add(TrainingSession(date: current, type: SessionType.paradeNight));
       }
       current = current.add(const Duration(days: 1));
     }
 
-    state = state.copyWith(sessions: sessions, academicYear: startYear);
+    state = state.copyWith(sessions: sessions, academicYear: startYear, paradeWeekday: weekday);
     _save();
   }
 
   void setAcademicYear(int year) {
-    _initializeYear(year);
+    _initializeYear(year, state.paradeWeekday);
+  }
+
+  void setParadeWeekday(int weekday) {
+    _initializeYear(state.academicYear, weekday);
+  }
+
+  void addAdHocSession(DateTime date, SessionType type) {
+    state = state.copyWith(
+      sessions: [...state.sessions, TrainingSession(date: date, type: type)]..sort((a, b) => a.date.compareTo(b.date)),
+    );
+    _save();
   }
 
   void assignLesson(String sessionId, Phase phase, int periodIndex, LessonSlot slot) {

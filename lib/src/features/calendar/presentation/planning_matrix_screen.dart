@@ -8,6 +8,7 @@ import '../domain/training_session.dart';
 import '../../../theme/app_theme.dart';
 import '../../lessons/presentation/lesson_selector_sheet.dart';
 import '../../lessons/domain/lesson.dart';
+import '../application/pdf_service.dart';
 
 class PlanningMatrixScreen extends ConsumerWidget {
   final String sessionId;
@@ -47,7 +48,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(LucideIcons.chevronLeft, color: Colors.white),
-          onPressed: () => context.pop(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Column(
           children: [
@@ -66,6 +67,12 @@ class PlanningMatrixScreen extends ConsumerWidget {
           ],
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(LucideIcons.download, color: AppTheme.gold),
+            onPressed: () => PdfService.generateRoutineOrder(session),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -133,7 +140,6 @@ class PlanningMatrixScreen extends ConsumerWidget {
       ],
     );
   }
-}
 
   String _getTypeLabel(SessionType type) {
     switch (type) {
