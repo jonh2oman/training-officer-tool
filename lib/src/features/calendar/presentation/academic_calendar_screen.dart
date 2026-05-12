@@ -70,7 +70,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
                       value: trainingState.paradeWeekday,
                       dropdownColor: AppTheme.black,
                       underline: const SizedBox(),
-                      dense: true,
+                      isDense: true,
                       style: const TextStyle(color: AppTheme.gold, fontWeight: FontWeight.bold, fontSize: 10),
                       onChanged: (day) {
                         if (day != null) {
