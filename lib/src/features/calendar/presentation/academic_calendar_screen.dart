@@ -6,9 +6,10 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/gestures.dart';
 import '../application/training_controller.dart';
 import '../domain/training_session.dart';
+import 'progress_dashboard_screen.dart';
 import '../../../theme/app_theme.dart';
 
-enum ViewType { list, calendar, board }
+enum ViewType { list, calendar, board, dashboard }
 
 class AcademicCalendarScreen extends ConsumerStatefulWidget {
   const AcademicCalendarScreen({super.key});
@@ -101,8 +102,9 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
             child: SegmentedButton<ViewType>(
               segments: const [
                 ButtonSegment(value: ViewType.list, icon: Icon(LucideIcons.list), label: Text('LIST')),
-                ButtonSegment(value: ViewType.calendar, icon: Icon(LucideIcons.calendar), label: Text('CALENDAR')),
+                ButtonSegment(value: ViewType.calendar, icon: Icon(LucideIcons.calendar), label: Text('CAL')),
                 ButtonSegment(value: ViewType.board, icon: Icon(LucideIcons.columns), label: Text('BOARD')),
+                ButtonSegment(value: ViewType.dashboard, icon: Icon(LucideIcons.barChart3), label: Text('STATS')),
               ],
               selected: {_currentView},
               onSelectionChanged: (newView) => setState(() => _currentView = newView.first),
@@ -188,7 +190,13 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
         return _buildCalendarView(trainingState.sessions);
       case ViewType.board:
         return _buildBoardView(groupedSessions);
+      case ViewType.dashboard:
+        return _buildDashboardView(trainingState.sessions);
     }
+  }
+
+  Widget _buildDashboardView(List<TrainingSession> sessions) {
+    return ProgressDashboardScreen(sessions: sessions);
   }
 
   Widget _buildListView(Map<String, List<TrainingSession>> groupedSessions) {
