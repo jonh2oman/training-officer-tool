@@ -3,8 +3,11 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../domain/lesson.dart';
 import '../../calendar/domain/training_session.dart';
 import '../../../theme/app_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../calendar/application/training_controller.dart';
+import 'package:intl/intl.dart';
 
-class LessonSelectorSheet extends StatefulWidget {
+class LessonSelectorSheet extends ConsumerStatefulWidget {
   final Phase phase;
   final Function(Lesson lesson, String instructor, String location) onSelected;
 
@@ -15,16 +18,30 @@ class LessonSelectorSheet extends StatefulWidget {
   });
 
   @override
-  State<LessonSelectorSheet> createState() => _LessonSelectorSheetState();
+  ConsumerState<LessonSelectorSheet> createState() => _LessonSelectorSheetState();
 }
 
-class _LessonSelectorSheetState extends State<LessonSelectorSheet> {
+class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
   String _searchQuery = '';
   String _selectedCategory = 'Fundamental';
 
   @override
   Widget build(BuildContext context) {
+    final trainingState = ref.watch(trainingProvider);
     final allLessons = LessonLibrary.getLessonsForPhase(widget.phase);
+    
+    // Map of EO code -> List of Dates where it is planned
+    final Map<String, List<DateTime>> plannedMap = {};
+    for (var session in trainingState.sessions) {
+      for (var phase in session.matrix.values) {
+        for (var slot in phase) {
+          if (slot.eoCode != null) {
+            plannedMap.putIfAbsent(slot.eoCode!, () => []).add(session.date);
+          }
+        }
+      }
+    }
+
     final filteredLessons = allLessons.where((l) {
       final matchesSearch = l.code.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           l.title.toLowerCase().contains(_searchQuery.toLowerCase());
@@ -50,8 +67,11 @@ class _LessonSelectorSheetState extends State<LessonSelectorSheet> {
               itemCount: filteredLessons.length,
               itemBuilder: (context, index) {
                 final lesson = filteredLessons[index];
+                final plannedDates = plannedMap[lesson.code] ?? [];
+                
                 return _LessonTile(
                   lesson: lesson,
+                  plannedDates: plannedDates,
                   onTap: () {
                     widget.onSelected(lesson, _instructor, _location);
                     Navigator.pop(context);
@@ -198,18 +218,28 @@ class _LessonSelectorSheetState extends State<LessonSelectorSheet> {
 
 class _LessonTile extends StatelessWidget {
   final Lesson lesson;
+  final List<DateTime> plannedDates;
   final VoidCallback onTap;
 
-  const _LessonTile({required this.lesson, required this.onTap});
+  const _LessonTile({
+    required this.lesson,
+    required this.plannedDates,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final bool isMaxed = plannedDates.length >= lesson.periods;
+    final bool hasConflict = lesson.periods == 1 && plannedDates.isNotEmpty;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: isMaxed ? Colors.white.withOpacity(0.01) : Colors.white.withOpacity(0.03),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(
+          color: isMaxed ? Colors.red.withOpacity(0.1) : Colors.white.withOpacity(0.05),
+        ),
       ),
       child: ListTile(
         onTap: onTap,
@@ -218,22 +248,30 @@ class _LessonTile extends StatelessWidget {
           children: [
             Text(
               lesson.code,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: AppTheme.gold,
+                color: isMaxed ? Colors.white24 : AppTheme.gold,
                 fontFamily: 'monospace',
               ),
             ),
             const SizedBox(width: 8),
             if (lesson.isMandatory)
-              const Icon(LucideIcons.star, size: 14, color: AppTheme.gold),
+              Icon(LucideIcons.star, size: 14, color: isMaxed ? Colors.white10 : AppTheme.gold),
+            const Spacer(),
+            if (hasConflict)
+              _buildWarningTag('ALREADY PLANNED (${DateFormat('MMM d').format(plannedDates.first)})')
+            else if (plannedDates.isNotEmpty)
+              _buildProgressTag('PLANNED ${plannedDates.length}/${lesson.periods}P'),
           ],
         ),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 8),
           child: Text(
             lesson.title,
-            style: const TextStyle(color: Colors.white70, height: 1.3),
+            style: TextStyle(
+              color: isMaxed ? Colors.white10 : Colors.white70,
+              height: 1.3,
+            ),
           ),
         ),
         trailing: Container(
@@ -247,6 +285,34 @@ class _LessonTile extends StatelessWidget {
             style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildWarningTag(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.redAccent, fontSize: 8, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildProgressTag(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.blueAccent, fontSize: 8, fontWeight: FontWeight.bold),
       ),
     );
   }
