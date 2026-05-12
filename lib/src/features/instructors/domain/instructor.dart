@@ -6,7 +6,7 @@ class Instructor {
   final String rank;
   final bool isStaff;
 
-  const Instructor({
+  Instructor({
     String? id,
     required this.name,
     required this.rank,

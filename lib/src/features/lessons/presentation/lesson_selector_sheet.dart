@@ -182,7 +182,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
           Row(
             children: [
               Expanded(
-                child: _buildSmallField('Instructor', LucideIcons.user, (val) => _instructor = val),
+                child: _buildSmallField('Instructor', LucideIcons.user, (val) => _instructorName = val),
               ),
               const SizedBox(width: 12),
               Expanded(
