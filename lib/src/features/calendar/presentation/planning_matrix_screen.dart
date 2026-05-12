@@ -6,11 +6,35 @@ import 'package:go_router/go_router.dart';
 import '../application/training_controller.dart';
 import '../domain/training_session.dart';
 import '../../../theme/app_theme.dart';
+import '../../lessons/presentation/lesson_selector_sheet.dart';
+import '../../lessons/domain/lesson.dart';
 
 class PlanningMatrixScreen extends ConsumerWidget {
   final String sessionId;
 
   const PlanningMatrixScreen({super.key, required this.sessionId});
+
+  void _showLessonSelector(BuildContext context, WidgetRef ref, Phase phase, int periodIndex) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => LessonSelectorSheet(
+        phase: phase,
+        onSelected: (lesson) {
+          ref.read(trainingProvider.notifier).assignLesson(
+                sessionId,
+                phase,
+                periodIndex,
+                LessonSlot(
+                  eoCode: lesson.code,
+                  title: lesson.title,
+                ),
+              );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,11 +64,11 @@ class PlanningMatrixScreen extends ConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _buildPeriodRow(context, 'PERIOD 1', session, 0),
+                _buildPeriodRow(context, ref, 'PERIOD 1', session, 0),
                 const SizedBox(height: 16),
-                _buildPeriodRow(context, 'PERIOD 2', session, 1),
+                _buildPeriodRow(context, ref, 'PERIOD 2', session, 1),
                 const SizedBox(height: 16),
-                _buildPeriodRow(context, 'PERIOD 3', session, 2),
+                _buildPeriodRow(context, ref, 'PERIOD 3', session, 2),
               ],
             ),
           ),
@@ -73,7 +97,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPeriodRow(BuildContext context, String label, TrainingSession session, int periodIndex) {
+  Widget _buildPeriodRow(BuildContext context, WidgetRef ref, String label, TrainingSession session, int periodIndex) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -93,9 +117,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
           Expanded(
             child: _LessonSlotCard(
               slot: session.matrix[phase]![periodIndex],
-              onTap: () {
-                // Future: Open EO Selector
-              },
+              onTap: () => _showLessonSelector(context, ref, phase, periodIndex),
             ),
           ),
       ],

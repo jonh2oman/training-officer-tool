@@ -56,9 +56,18 @@ class TrainingController extends StateNotifier<TrainingState> {
     );
   }
   
-  void addSession(DateTime date, SessionType type) {
+  void assignLesson(String sessionId, Phase phase, int periodIndex, LessonSlot slot) {
     state = state.copyWith(
-      sessions: [...state.sessions, TrainingSession(date: date, type: type)]..sort((a, b) => a.date.compareTo(b.date)),
+      sessions: state.sessions.map((s) {
+        if (s.id == sessionId) {
+          final newMatrix = Map<Phase, List<LessonSlot>>.from(s.matrix);
+          final newList = List<LessonSlot>.from(newMatrix[phase]!);
+          newList[periodIndex] = slot;
+          newMatrix[phase] = newList;
+          return s.copyWith(matrix: newMatrix);
+        }
+        return s;
+      }).toList(),
     );
   }
 }
