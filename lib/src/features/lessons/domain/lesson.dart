@@ -19,7 +19,7 @@ class Lesson {
 }
 
 class LessonLibrary {
-  static const List<Lesson> allLessons = [
+  static final List<Lesson> allLessons = [
     // ==========================================
     // PHASE 1
     // ==========================================
