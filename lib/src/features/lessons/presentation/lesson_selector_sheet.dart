@@ -6,7 +6,7 @@ import '../../../theme/app_theme.dart';
 
 class LessonSelectorSheet extends StatefulWidget {
   final Phase phase;
-  final Function(Lesson) onSelected;
+  final Function(Lesson lesson, String instructor, String location) onSelected;
 
   const LessonSelectorSheet({
     super.key,
@@ -53,7 +53,7 @@ class _LessonSelectorSheetState extends State<LessonSelectorSheet> {
                 return _LessonTile(
                   lesson: lesson,
                   onTap: () {
-                    widget.onSelected(lesson);
+                    widget.onSelected(lesson, _instructor, _location);
                     Navigator.pop(context);
                   },
                 );
@@ -141,17 +141,55 @@ class _LessonSelectorSheetState extends State<LessonSelectorSheet> {
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.all(24),
-      child: TextField(
-        onChanged: (val) => setState(() => _searchQuery = val),
-        decoration: InputDecoration(
-          hintText: 'Search EO code or title...',
-          prefixIcon: const Icon(LucideIcons.search, size: 20),
-          filled: true,
-          fillColor: Colors.white.withOpacity(0.05),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
+      child: Column(
+        children: [
+          TextField(
+            onChanged: (val) => setState(() => _searchQuery = val),
+            decoration: InputDecoration(
+              hintText: 'Search EO code or title...',
+              prefixIcon: const Icon(LucideIcons.search, size: 20),
+              filled: true,
+              fillColor: Colors.white.withOpacity(0.05),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+            ),
           ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildSmallField('Instructor', LucideIcons.user, (val) => _instructor = val),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildSmallField('Location', LucideIcons.mapPin, (val) => _location = val),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _instructor = '';
+  String _location = '';
+
+  Widget _buildSmallField(String hint, IconData icon, Function(String) onChanged) {
+    return TextField(
+      onChanged: onChanged,
+      style: const TextStyle(fontSize: 12),
+      decoration: InputDecoration(
+        hintText: hint,
+        prefixIcon: Icon(icon, size: 14),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.05),
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
       ),
     );

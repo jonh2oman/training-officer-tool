@@ -21,7 +21,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => LessonSelectorSheet(
         phase: phase,
-        onSelected: (lesson) {
+        onSelected: (lesson, instructor, location) {
           ref.read(trainingProvider.notifier).assignLesson(
                 sessionId,
                 phase,
@@ -29,6 +29,8 @@ class PlanningMatrixScreen extends ConsumerWidget {
                 LessonSlot(
                   eoCode: lesson.code,
                   title: lesson.title,
+                  instructor: instructor.isEmpty ? null : instructor,
+                  location: location.isEmpty ? null : location,
                 ),
               );
         },
@@ -170,10 +172,23 @@ class _LessonSlotCard extends StatelessWidget {
                       style: const TextStyle(fontSize: 11, height: 1.2),
                     ),
                     const Spacer(),
-                    if (slot.instructor != null)
-                      Text(
-                        slot.instructor!,
-                        style: const TextStyle(fontSize: 9, color: Colors.white38),
+                    if (slot.instructor != null || slot.location != null)
+                      Row(
+                        children: [
+                          if (slot.instructor != null)
+                            Expanded(
+                              child: Text(
+                                slot.instructor!,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 8, color: Colors.white38),
+                              ),
+                            ),
+                          if (slot.location != null)
+                            Text(
+                              '@ ${slot.location!}',
+                              style: TextStyle(fontSize: 8, color: AppTheme.gold.withOpacity(0.5)),
+                            ),
+                        ],
                       ),
                   ],
                 ),
