@@ -20,7 +20,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => LessonSelectorSheet(
         phase: phase,
-        onSelected: (lesson, instructor, location) {
+        onSelected: (lesson, instructor, instructorId, location) {
           ref.read(trainingProvider.notifier).assignLesson(
                 sessionId,
                 phase,
@@ -29,6 +29,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
                   eoCode: lesson.code,
                   title: lesson.title,
                   instructor: instructor.isEmpty ? null : instructor,
+                  instructorId: instructorId,
                   location: location.isEmpty ? null : location,
                 ),
               );
@@ -130,11 +131,26 @@ class PlanningMatrixScreen extends ConsumerWidget {
           Expanded(
             child: _LessonSlotCard(
               slot: session.matrix[phase]![periodIndex],
+              hasConflict: _checkForConflict(session, periodIndex, phase),
               onTap: () => _showLessonSelector(context, ref, phase, periodIndex),
             ),
           ),
       ],
     );
+  }
+
+  bool _checkForConflict(TrainingSession session, int periodIndex, Phase currentPhase) {
+    final currentInstructorId = session.matrix[currentPhase]![periodIndex].instructorId;
+    if (currentInstructorId == null) return false;
+
+    // Check all OTHER phases in the SAME period
+    for (var phase in Phase.values) {
+      if (phase == currentPhase) continue;
+      if (session.matrix[phase]![periodIndex].instructorId == currentInstructorId) {
+        return true;
+      }
+    }
+    return false;
   }
 
   String _getTypeLabel(SessionType type) {
@@ -148,9 +164,10 @@ class PlanningMatrixScreen extends ConsumerWidget {
 
 class _LessonSlotCard extends StatelessWidget {
   final LessonSlot slot;
+  final bool hasConflict;
   final VoidCallback onTap;
 
-  const _LessonSlotCard({required this.slot, required this.onTap});
+  const _LessonSlotCard({required this.slot, this.hasConflict = false, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -179,9 +196,19 @@ class _LessonSlotCard extends StatelessWidget {
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      slot.eoCode ?? '',
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.gold),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          slot.eoCode ?? '',
+                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.gold),
+                        ),
+                        if (hasConflict)
+                          const Tooltip(
+                            message: 'Instructor Conflict!',
+                            child: Icon(LucideIcons.alertTriangle, size: 12, color: Colors.redAccent),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(

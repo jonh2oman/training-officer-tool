@@ -19,13 +19,15 @@ enum Phase {
 class LessonSlot {
   final String? eoCode; // e.g. M103.01
   final String? title;
-  final String? instructor;
+  final String? instructor; // Kept for display/legacy
+  final String? instructorId; // Linked to Instructor Registry
   final String? location;
 
   const LessonSlot({
     this.eoCode,
     this.title,
     this.instructor,
+    this.instructorId,
     this.location,
   });
 
@@ -35,6 +37,7 @@ class LessonSlot {
     'eoCode': eoCode,
     'title': title,
     'instructor': instructor,
+    'instructorId': instructorId,
     'location': location,
   };
 
@@ -42,6 +45,7 @@ class LessonSlot {
     eoCode: json['eoCode'],
     title: json['title'],
     instructor: json['instructor'],
+    instructorId: json['instructorId'],
     location: json['location'],
   );
 }

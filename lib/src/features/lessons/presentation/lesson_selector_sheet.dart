@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../domain/lesson.dart';
 import '../../calendar/domain/training_session.dart';
+import '../../instructors/domain/instructor.dart';
+import '../../instructors/application/instructor_controller.dart';
 import '../../../theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../calendar/application/training_controller.dart';
@@ -9,7 +11,7 @@ import 'package:intl/intl.dart';
 
 class LessonSelectorSheet extends ConsumerStatefulWidget {
   final Phase phase;
-  final Function(Lesson lesson, String instructor, String location) onSelected;
+  final Function(Lesson lesson, String instructor, String? instructorId, String location) onSelected;
 
   const LessonSelectorSheet({
     super.key,
@@ -73,7 +75,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
                   lesson: lesson,
                   plannedDates: plannedDates,
                   onTap: () {
-                    widget.onSelected(lesson, _instructor, _location);
+                    widget.onSelected(lesson, _instructorName, _selectedInstructorId, _location);
                     Navigator.pop(context);
                   },
                 );
@@ -193,10 +195,48 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
     );
   }
 
-  String _instructor = '';
+  String _instructorName = '';
+  String? _selectedInstructorId;
   String _location = '';
 
   Widget _buildSmallField(String hint, IconData icon, Function(String) onChanged) {
+    if (hint == 'Instructor') {
+      final instructors = ref.watch(instructorProvider);
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            isExpanded: true,
+            hint: Row(
+              children: [
+                Icon(icon, size: 14, color: Colors.white38),
+                const SizedBox(width: 8),
+                Text(hint, style: const TextStyle(fontSize: 12, color: Colors.white38)),
+              ],
+            ),
+            value: _selectedInstructorId,
+            dropdownColor: AppTheme.black,
+            items: instructors.map((i) => DropdownMenuItem(
+              value: i.id,
+              child: Text(i.displayName, style: const TextStyle(fontSize: 12)),
+            )).toList(),
+            onChanged: (val) {
+              if (val != null) {
+                final instructor = instructors.firstWhere((i) => i.id == val);
+                setState(() {
+                  _selectedInstructorId = val;
+                  _instructorName = instructor.displayName;
+                });
+              }
+            },
+          ),
+        ),
+      );
+    }
     return TextField(
       onChanged: onChanged,
       style: const TextStyle(fontSize: 12),
