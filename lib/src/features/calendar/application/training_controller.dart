@@ -27,9 +27,8 @@ class TrainingController extends StateNotifier<TrainingState> {
   }
 
   void _initializeAcademicYear() {
-    // Basic logic to find all Tuesdays between Sep 1 and Jun 30
-    final now = DateTime.now();
-    final startYear = now.month >= 9 ? now.year : now.year - 1;
+    // Setting specifically for the 2026-2027 academic year
+    const startYear = 2026;
     final startDate = DateTime(startYear, 9, 1);
     final endDate = DateTime(startYear + 1, 6, 30);
 

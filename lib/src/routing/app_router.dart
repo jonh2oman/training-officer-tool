@@ -12,14 +12,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/',
         builder: (context, state) => const AcademicCalendarScreen(),
-        routes: [
-          GoRoute(
-            path: 'planning/:sessionId',
-            builder: (context, state) => PlanningMatrixScreen(
-              sessionId: state.pathParameters['sessionId']!,
-            ),
-          ),
-        ],
+      ),
+      GoRoute(
+        path: '/planning/:sessionId',
+        builder: (context, state) => PlanningMatrixScreen(
+          sessionId: state.pathParameters['sessionId']!,
+        ),
       ),
     ],
   );

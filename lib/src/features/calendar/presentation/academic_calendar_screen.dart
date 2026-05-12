@@ -22,7 +22,23 @@ class AcademicCalendarScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ACADEMIC YEAR 2026-2027'),
+        title: Column(
+          children: [
+            Text(
+              'ACADEMIC YEAR 2026-2027',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'SEA CADET CORPS PLANNING',
+              style: TextStyle(
+                fontSize: 10,
+                color: AppTheme.gold.withOpacity(0.7),
+                letterSpacing: 2,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(LucideIcons.fileText),
