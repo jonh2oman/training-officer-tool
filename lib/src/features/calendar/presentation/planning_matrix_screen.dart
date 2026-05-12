@@ -1,0 +1,162 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:go_router/go_router.dart';
+import '../application/training_controller.dart';
+import '../domain/training_session.dart';
+import '../../../theme/app_theme.dart';
+
+class PlanningMatrixScreen extends ConsumerWidget {
+  final String sessionId;
+
+  const PlanningMatrixScreen({super.key, required this.sessionId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final trainingState = ref.watch(trainingProvider);
+    final session = trainingState.sessions.firstWhere((s) => s.id == sessionId);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Column(
+          children: [
+            Text(DateFormat('dd MMMM yyyy').format(session.date).toUpperCase()),
+            Text(
+              'PARADE NIGHT PLANNING',
+              style: TextStyle(fontSize: 10, color: AppTheme.gold.withOpacity(0.7), letterSpacing: 2),
+            ),
+          ],
+        ),
+        leading: IconButton(
+          icon: const Icon(LucideIcons.arrowLeft),
+          onPressed: () => context.pop(),
+        ),
+      ),
+      body: Column(
+        children: [
+          _buildPhaseHeader(),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                _buildPeriodRow(context, 'PERIOD 1', session, 0),
+                const SizedBox(height: 16),
+                _buildPeriodRow(context, 'PERIOD 2', session, 1),
+                const SizedBox(height: 16),
+                _buildPeriodRow(context, 'PERIOD 3', session, 2),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhaseHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      color: Colors.white.withOpacity(0.05),
+      child: Row(
+        children: [
+          const SizedBox(width: 80), // Label space
+          for (var phase in Phase.values)
+            Expanded(
+              child: Text(
+                phase.label.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white38),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPeriodRow(BuildContext context, String label, TrainingSession session, int periodIndex) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 80,
+          height: 120,
+          alignment: Alignment.center,
+          child: RotatedBox(
+            quarterTurns: 3,
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.white10, letterSpacing: 4),
+            ),
+          ),
+        ),
+        for (var phase in Phase.values)
+          Expanded(
+            child: _LessonSlotCard(
+              slot: session.matrix[phase]![periodIndex],
+              onTap: () {
+                // Future: Open EO Selector
+              },
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _LessonSlotCard extends StatelessWidget {
+  final LessonSlot slot;
+  final VoidCallback onTap;
+
+  const _LessonSlotCard({required this.slot, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 120,
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: slot.isEmpty
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(LucideIcons.plus, size: 16, color: Colors.white.withOpacity(0.2)),
+                    const SizedBox(height: 4),
+                    const Text('EMPTY', style: TextStyle(fontSize: 8, color: Colors.white10, fontWeight: FontWeight.bold)),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      slot.eoCode ?? '',
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.gold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      slot.title ?? '',
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 11, height: 1.2),
+                    ),
+                    const Spacer(),
+                    if (slot.instructor != null)
+                      Text(
+                        slot.instructor!,
+                        style: const TextStyle(fontSize: 9, color: Colors.white38),
+                      ),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+}

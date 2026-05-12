@@ -96,7 +96,7 @@ class _SessionCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () {}, // Navigate to Matrix
+        onTap: () => context.go('/planning/${session.id}'),
         borderRadius: BorderRadius.circular(24),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
