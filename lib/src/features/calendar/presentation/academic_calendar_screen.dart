@@ -7,11 +7,20 @@ import '../application/training_controller.dart';
 import '../domain/training_session.dart';
 import '../../../theme/app_theme.dart';
 
-class AcademicCalendarScreen extends ConsumerWidget {
+enum ViewType { list, calendar, board }
+
+class AcademicCalendarScreen extends ConsumerStatefulWidget {
   const AcademicCalendarScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AcademicCalendarScreen> createState() => _AcademicCalendarScreenState();
+}
+
+class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen> {
+  ViewType _currentView = ViewType.list;
+
+  @override
+  Widget build(BuildContext context) {
     final trainingState = ref.watch(trainingProvider);
     
     // Group sessions by month
@@ -40,6 +49,25 @@ class AcademicCalendarScreen extends ConsumerWidget {
           ],
         ),
         centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: SegmentedButton<ViewType>(
+              segments: const [
+                ButtonSegment(value: ViewType.list, icon: Icon(LucideIcons.list), label: Text('LIST')),
+                ButtonSegment(value: ViewType.calendar, icon: Icon(LucideIcons.calendar), label: Text('CALENDAR')),
+                ButtonSegment(value: ViewType.board, icon: Icon(LucideIcons.columns), label: Text('BOARD')),
+              ],
+              selected: {_currentView},
+              onSelectionChanged: (newView) => setState(() => _currentView = newView.first),
+              style: ButtonStyle(
+                visualDensity: VisualDensity.compact,
+                side: WidgetStateProperty.all(BorderSide(color: AppTheme.gold.withOpacity(0.2))),
+              ),
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(LucideIcons.fileText),
@@ -47,32 +75,7 @@ class AcademicCalendarScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(24),
-        itemCount: groupedSessions.keys.length,
-        itemBuilder: (context, index) {
-          final month = groupedSessions.keys.elementAt(index);
-          final sessions = groupedSessions[month]!;
-          
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text(
-                  month.toUpperCase(),
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppTheme.gold,
-                    letterSpacing: 2,
-                  ),
-                ),
-              ),
-              ...sessions.map((session) => _SessionCard(session: session)),
-              const SizedBox(height: 24),
-            ],
-          );
-        },
-      ),
+      body: _buildCurrentView(trainingState, groupedSessions),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {}, // Add special day (Day Mode / Weekend)
         icon: const Icon(LucideIcons.plus),
@@ -80,6 +83,157 @@ class AcademicCalendarScreen extends ConsumerWidget {
         backgroundColor: AppTheme.gold,
         foregroundColor: AppTheme.black,
       ),
+    );
+  }
+
+  Widget _buildCurrentView(dynamic trainingState, Map<String, List<TrainingSession>> groupedSessions) {
+    switch (_currentView) {
+      case ViewType.list:
+        return _buildListView(groupedSessions);
+      case ViewType.calendar:
+        return _buildCalendarView(trainingState.sessions);
+      case ViewType.board:
+        return _buildBoardView(groupedSessions);
+    }
+  }
+
+  Widget _buildListView(Map<String, List<TrainingSession>> groupedSessions) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(24),
+      itemCount: groupedSessions.keys.length,
+      itemBuilder: (context, index) {
+        final month = groupedSessions.keys.elementAt(index);
+        final sessions = groupedSessions[month]!;
+        
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Text(
+                month.toUpperCase(),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: AppTheme.gold,
+                  letterSpacing: 2,
+                ),
+              ),
+            ),
+            ...sessions.map((session) => _SessionCard(session: session)),
+            const SizedBox(height: 24),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildCalendarView(List<TrainingSession> sessions) {
+    final Map<DateTime, TrainingSession> dateMap = {
+      for (var s in sessions) DateTime(s.date.year, s.date.month, s.date.day): s
+    };
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          for (int m = 9; m <= 18; m++) ...[
+            _buildMonthGrid(m > 12 ? m - 12 : m, m > 12 ? 2027 : 2026, dateMap),
+            const SizedBox(height: 48),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMonthGrid(int month, int year, Map<DateTime, TrainingSession> dateMap) {
+    final firstDay = DateTime(year, month, 1);
+    final daysInMonth = DateUtils.getDaysInMonth(year, month);
+    final offset = firstDay.weekday % 7;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          DateFormat('MMMM yyyy').format(firstDay).toUpperCase(),
+          style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2, color: AppTheme.gold),
+        ),
+        const SizedBox(height: 16),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 7,
+            childAspectRatio: 1,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+          ),
+          itemCount: daysInMonth + offset,
+          itemBuilder: (context, index) {
+            if (index < offset) return const SizedBox();
+            final day = index - offset + 1;
+            final date = DateTime(year, month, day);
+            final session = dateMap[date];
+
+            return InkWell(
+              onTap: session != null ? () => context.go('/planning/${session.id}') : null,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: session != null ? AppTheme.navy : Colors.white.withOpacity(0.02),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: session != null ? AppTheme.gold.withOpacity(0.5) : Colors.white.withOpacity(0.05),
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('$day', style: TextStyle(fontSize: 10, color: session != null ? Colors.white : Colors.white24)),
+                    if (session != null)
+                      const Icon(LucideIcons.anchor, size: 10, color: AppTheme.gold),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBoardView(Map<String, List<TrainingSession>> groupedSessions) {
+    return ListView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.all(24),
+      children: groupedSessions.entries.map((entry) {
+        return Container(
+          width: 320,
+          margin: const EdgeInsets.only(right: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppTheme.gold.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  entry.key.toUpperCase(),
+                  style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2, color: AppTheme.gold, fontSize: 12),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Expanded(
+                child: ListView(
+                  children: entry.value.map((s) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _SessionCard(session: s),
+                  )).toList(),
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 }
