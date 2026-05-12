@@ -76,15 +76,13 @@ class PlanningMatrixScreen extends ConsumerWidget {
         children: [
           _buildPhaseHeader(),
           Expanded(
-            child: ListView(
+            child: ListView.separated(
               padding: const EdgeInsets.all(16),
-              children: [
-                _buildPeriodRow(context, ref, 'PERIOD 1', session, 0),
-                const SizedBox(height: 16),
-                _buildPeriodRow(context, ref, 'PERIOD 2', session, 1),
-                const SizedBox(height: 16),
-                _buildPeriodRow(context, ref, 'PERIOD 3', session, 2),
-              ],
+              itemCount: session.numPeriods,
+              separatorBuilder: (context, index) => const SizedBox(height: 16),
+              itemBuilder: (context, index) {
+                return _buildPeriodRow(context, ref, 'PERIOD ${index + 1}', session, index);
+              },
             ),
           ),
         ],

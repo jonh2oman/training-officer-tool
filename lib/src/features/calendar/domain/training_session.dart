@@ -62,10 +62,27 @@ class TrainingSession {
     this.description,
     Map<Phase, List<LessonSlot>>? matrix,
   }) : id = id ?? const Uuid().v4(),
-       matrix = matrix ?? {
-         for (var phase in Phase.values)
-           phase: List.generate(3, (_) => const LessonSlot()),
-       };
+       matrix = _initializeMatrix(type, matrix);
+
+  static Map<Phase, List<LessonSlot>> _initializeMatrix(SessionType type, Map<Phase, List<LessonSlot>>? provided) {
+    final targetCount = type == SessionType.paradeNight ? 3 : 9;
+    final Map<Phase, List<LessonSlot>> result = {};
+    
+    for (var phase in Phase.values) {
+      final list = provided?[phase] ?? [];
+      if (list.length >= targetCount) {
+        result[phase] = list.sublist(0, targetCount);
+      } else {
+        result[phase] = [
+          ...list,
+          ...List.generate(targetCount - list.length, (_) => const LessonSlot()),
+        ];
+      }
+    }
+    return result;
+  }
+
+  int get numPeriods => type == SessionType.paradeNight ? 3 : 9;
 
   TrainingSession copyWith({
     DateTime? date,
