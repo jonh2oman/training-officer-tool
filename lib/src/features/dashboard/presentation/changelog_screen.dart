@@ -21,6 +21,18 @@ class ChangelogScreen extends StatelessWidget {
         children: [
           _buildVersion(
             context,
+            '1.2.1',
+            'May 14, 2026',
+            [
+              'Visual Workflows: Interactive roadmap diagrams in the Help Center.',
+              'Setup Roadmap: Comprehensive step-by-step guide for new Training Officers.',
+              'UI Enhancement: Smoother vertical timeline rendering for instructions.',
+            ],
+            isLatest: true,
+          ),
+          const SizedBox(height: 24),
+          _buildVersion(
+            context,
             '1.2.0',
             'May 14, 2026',
             [
@@ -29,7 +41,6 @@ class ChangelogScreen extends StatelessWidget {
               'Smart Persistence: Remembers your preferred calendar view across sessions.',
               'UI Header Refresh: New toggle controls for cleaner navigation.',
             ],
-            isLatest: true,
           ),
           const SizedBox(height: 24),
           _buildVersion(

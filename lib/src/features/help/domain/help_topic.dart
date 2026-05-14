@@ -2,15 +2,58 @@ class HelpTopic {
   final String title;
   final String category;
   final String content;
+  final List<WorkflowStep>? steps;
 
   const HelpTopic({
     required this.title,
     required this.category,
     required this.content,
+    this.steps,
   });
 }
 
+class WorkflowStep {
+  final String title;
+  final String description;
+  final dynamic icon;
+
+  const WorkflowStep({
+    required this.title,
+    required this.description,
+    required this.icon,
+  });
+}
+
+import 'package:lucide_icons/lucide_icons.dart';
+
 const List<HelpTopic> helpTopics = [
+  HelpTopic(
+    title: 'Initial Setup Roadmap',
+    category: 'Getting Started',
+    content: 'Follow these steps to get your training year configured perfectly from day one.',
+    steps: [
+      WorkflowStep(
+        title: 'Populate Registries',
+        description: 'Start by adding your Instructors and Training Locations. This enables the deconfliction engine to track availability.',
+        icon: LucideIcons.users,
+      ),
+      WorkflowStep(
+        title: 'Set Your Element',
+        description: 'Choose between Sea, Army, or Air Cadets in the Dashboard. This updates all Lesson Library EOs to match your curriculum.',
+        icon: LucideIcons.anchor,
+      ),
+      WorkflowStep(
+        title: 'Configure Calendar',
+        description: 'Switch between Academic Year (Sep-Jun) or Full Year (Jan-Dec) and set your primary parade night.',
+        icon: LucideIcons.calendar,
+      ),
+      WorkflowStep(
+        title: 'Start Planning',
+        description: 'Navigate to the Calendar to add sessions, or use the Experimental Auto-Plan tool to distribute mandatory lessons.',
+        icon: LucideIcons.wand2,
+      ),
+    ],
+  ),
   HelpTopic(
     title: 'Scheduling Lessons',
     category: 'Calendar',
