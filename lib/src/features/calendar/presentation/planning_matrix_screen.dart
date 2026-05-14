@@ -104,7 +104,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
           for (var phase in Phase.values)
             Expanded(
               child: Text(
-                phase.getLabel(trainingState.selectedElement).toUpperCase(),
+                phase.getLabel(ref.watch(trainingProvider).selectedElement).toUpperCase(),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
               ),

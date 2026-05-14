@@ -234,6 +234,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
         return;
       }
 
+      final trainingState = ref.read(trainingProvider);
       final title = 'Training Plan (${DateFormat('dd MMM').format(picked.start)} - ${DateFormat('dd MMM').format(picked.end)})';
       await PdfService.generateTrainingPlan(filteredSessions, title, trainingState.selectedElement);
     }
