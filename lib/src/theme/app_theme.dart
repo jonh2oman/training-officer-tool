@@ -30,7 +30,7 @@ class AppTheme {
   static ThemeData get seaTheme {
     final base = _buildTheme(Brightness.dark, seaBackground, seaSurface, Colors.white);
     return base.copyWith(
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         primary: seaAccent,
         secondary: gold,
         surface: seaSurface,
@@ -43,7 +43,7 @@ class AppTheme {
     const armyTan = Color(0xFFD2B48C);
     final base = _buildTheme(Brightness.dark, const Color(0xFF1B1E10), const Color(0xFF2E331A), Colors.white);
     return base.copyWith(
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         primary: armyGreen,
         secondary: armyTan,
         surface: Color(0xFF2E331A),
@@ -55,7 +55,7 @@ class AppTheme {
     const airSilver = Color(0xFFC0C0C0);
     final base = _buildTheme(Brightness.dark, const Color(0xFF001530), const Color(0xFF00254D), Colors.white);
     return base.copyWith(
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         primary: Color(0xFF38BDF8), // Using a brighter blue for accent
         secondary: airSilver,
         surface: Color(0xFF00254D),
