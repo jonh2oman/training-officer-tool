@@ -27,6 +27,45 @@ class PdfService {
             pw.Text('TYPE: ${session.type.name.toUpperCase()}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
             pw.SizedBox(height: 10),
             pw.Divider(),
+            
+            // Administrative Details
+            pw.SizedBox(height: 10),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text('DUTY OFFICER: ${session.dutyOfficer ?? 'TBD'}', style: const pw.TextStyle(fontSize: 10)),
+                    pw.Text('DUTY NCO: ${session.dutyNCO ?? 'TBD'}', style: const pw.TextStyle(fontSize: 10)),
+                  ],
+                ),
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                  children: [
+                    pw.Text('DRESS: ${session.dress ?? 'TBD'}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 10)),
+                  ],
+                ),
+              ],
+            ),
+            
+            if (session.announcements != null && session.announcements!.isNotEmpty) ...[
+              pw.SizedBox(height: 10),
+              pw.Container(
+                padding: const pw.EdgeInsets.all(8),
+                decoration: const pw.BoxDecoration(color: PdfColors.grey100),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text('ANNOUNCEMENTS:', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8)),
+                    pw.Text(session.announcements!, style: const pw.TextStyle(fontSize: 9)),
+                  ],
+                ),
+              ),
+            ],
+            
+            pw.SizedBox(height: 20),
+            pw.Divider(),
             pw.SizedBox(height: 20),
             
             // Matrix Table(s) - Split into chunks of 3 periods to fit on page

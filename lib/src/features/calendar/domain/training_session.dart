@@ -83,7 +83,11 @@ class TrainingSession {
   final String id;
   final DateTime date;
   final SessionType type;
-  final String? description;
+  // Administrative details for Routine Orders
+  final String? dutyOfficer;
+  final String? dutyNCO;
+  final String? dress;
+  final String? announcements;
   
   // Matrix: Phase -> List of 3 Periods
   final Map<Phase, List<LessonSlot>> matrix;
@@ -93,6 +97,10 @@ class TrainingSession {
     required this.date,
     required this.type,
     this.description,
+    this.dutyOfficer,
+    this.dutyNCO,
+    this.dress,
+    this.announcements,
     Map<Phase, List<LessonSlot>>? matrix,
   }) : id = id ?? const Uuid().v4(),
        matrix = _initializeMatrix(type, matrix);
@@ -121,6 +129,10 @@ class TrainingSession {
     DateTime? date,
     SessionType? type,
     String? description,
+    String? dutyOfficer,
+    String? dutyNCO,
+    String? dress,
+    String? announcements,
     Map<Phase, List<LessonSlot>>? matrix,
   }) {
     return TrainingSession(
@@ -128,6 +140,10 @@ class TrainingSession {
       date: date ?? this.date,
       type: type ?? this.type,
       description: description ?? this.description,
+      dutyOfficer: dutyOfficer ?? this.dutyOfficer,
+      dutyNCO: dutyNCO ?? this.dutyNCO,
+      dress: dress ?? this.dress,
+      announcements: announcements ?? this.announcements,
       matrix: matrix ?? this.matrix,
     );
   }
@@ -137,6 +153,10 @@ class TrainingSession {
     'date': date.toIso8601String(),
     'type': type.name,
     'description': description,
+    'dutyOfficer': dutyOfficer,
+    'dutyNCO': dutyNCO,
+    'dress': dress,
+    'announcements': announcements,
     'matrix': matrix.map((key, value) => MapEntry(key.name, value.map((e) => e.toJson()).toList())),
   };
 
@@ -146,6 +166,10 @@ class TrainingSession {
       date: DateTime.parse(json['date']),
       type: SessionType.values.byName(json['type']),
       description: json['description'],
+      dutyOfficer: json['dutyOfficer'],
+      dutyNCO: json['dutyNCO'],
+      dress: json['dress'],
+      announcements: json['announcements'],
       matrix: (json['matrix'] as Map<String, dynamic>).map(
         (key, value) => MapEntry(
           Phase.values.byName(key),

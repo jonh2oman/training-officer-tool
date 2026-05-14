@@ -78,6 +78,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
+          _buildAdminDetails(context, ref, session),
           _buildPhaseHeader(context, ref),
           Expanded(
             child: ListView.separated(
@@ -91,6 +92,96 @@ class PlanningMatrixScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildAdminDetails(BuildContext context, WidgetRef ref, TrainingSession session) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05))),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildAdminField(
+                  context,
+                  label: 'DUTY OFFICER',
+                  value: session.dutyOfficer ?? '',
+                  onChanged: (val) => ref.read(trainingProvider.notifier).updateSessionDetails(session.id, dutyOfficer: val),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildAdminField(
+                  context,
+                  label: 'DUTY NCO',
+                  value: session.dutyNCO ?? '',
+                  onChanged: (val) => ref.read(trainingProvider.notifier).updateSessionDetails(session.id, dutyNCO: val),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildAdminField(
+                  context,
+                  label: 'DRESS OF THE DAY',
+                  value: session.dress ?? '',
+                  onChanged: (val) => ref.read(trainingProvider.notifier).updateSessionDetails(session.id, dress: val),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildAdminField(
+                  context,
+                  label: 'ANNOUNCEMENTS',
+                  value: session.announcements ?? '',
+                  onChanged: (val) => ref.read(trainingProvider.notifier).updateSessionDetails(session.id, announcements: val),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdminField(BuildContext context, {required String label, required String value, required Function(String) onChanged}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 8,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: 4),
+        TextField(
+          onChanged: onChanged,
+          style: const TextStyle(fontSize: 12),
+          decoration: InputDecoration(
+            hintText: value.isEmpty ? 'Type here...' : value,
+            isDense: true,
+            contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            filled: true,
+            fillColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

@@ -98,6 +98,23 @@ class TrainingController extends StateNotifier<TrainingState> {
     _save();
   }
 
+  void updateSessionDetails(String sessionId, {String? dutyOfficer, String? dutyNCO, String? dress, String? announcements}) {
+    state = state.copyWith(
+      sessions: state.sessions.map((s) {
+        if (s.id == sessionId) {
+          return s.copyWith(
+            dutyOfficer: dutyOfficer,
+            dutyNCO: dutyNCO,
+            dress: dress,
+            announcements: announcements,
+          );
+        }
+        return s;
+      }).toList(),
+    );
+    _save();
+  }
+
   void assignLesson(String sessionId, Phase phase, int periodIndex, LessonSlot slot) {
     state = state.copyWith(
       sessions: state.sessions.map((s) {
