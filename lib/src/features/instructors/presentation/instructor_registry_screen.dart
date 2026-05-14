@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../application/instructor_controller.dart';
 import '../domain/instructor.dart';
 import '../../../theme/app_theme.dart';
+import '../../../shared/widgets/glass_container.dart';
 
 class InstructorRegistryScreen extends ConsumerWidget {
   const InstructorRegistryScreen({super.key});
@@ -46,7 +47,7 @@ class InstructorRegistryScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             'NO INSTRUCTORS REGISTRY',
-            style: TextStyle(color: Colors.white.withOpacity(0.5), letterSpacing: 1),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), letterSpacing: 1),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -68,8 +69,11 @@ class InstructorRegistryScreen extends ConsumerWidget {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          backgroundColor: AppTheme.black,
-          title: Text(instructor == null ? 'ADD INSTRUCTOR' : 'EDIT INSTRUCTOR', style: const TextStyle(color: AppTheme.gold)),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: Text(
+            instructor == null ? 'ADD INSTRUCTOR' : 'EDIT INSTRUCTOR', 
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -96,7 +100,7 @@ class InstructorRegistryScreen extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('CANCEL', style: TextStyle(color: Colors.white54)),
+              child: Text('CANCEL', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
             ),
             ElevatedButton(
               onPressed: () {
@@ -131,19 +135,27 @@ class _InstructorCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
+    return GlassContainer(
+      opacity: 0.05,
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: instructor.isStaff ? AppTheme.gold.withOpacity(0.1) : Colors.white.withOpacity(0.05),
+          backgroundColor: instructor.isStaff 
+            ? Theme.of(context).colorScheme.primary.withOpacity(0.1) 
+            : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
           child: Icon(
             instructor.isStaff ? LucideIcons.shieldCheck : LucideIcons.user,
-            color: instructor.isStaff ? AppTheme.gold : Colors.white38,
+            color: instructor.isStaff 
+              ? Theme.of(context).colorScheme.primary 
+              : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
             size: 20,
           ),
         ),
         title: Text(instructor.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(instructor.isStaff ? 'Adult Staff' : 'Senior Cadet', style: const TextStyle(fontSize: 10, color: Colors.white38)),
+        subtitle: Text(
+          instructor.isStaff ? 'Adult Staff' : 'Senior Cadet', 
+          style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

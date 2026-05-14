@@ -13,11 +13,15 @@ import 'package:intl/intl.dart';
 
 class LessonSelectorSheet extends ConsumerStatefulWidget {
   final Phase phase;
+  final int periodIndex;
+  final String sessionId;
   final Function(Lesson lesson, String instructor, String? instructorId, String location, String? locationId) onSelected;
 
   const LessonSelectorSheet({
     super.key,
     required this.phase,
+    required this.periodIndex,
+    required this.sessionId,
     required this.onSelected,
   });
 
@@ -37,11 +41,11 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
     // Map of EO code -> List of Dates where it is planned
     final Map<String, List<DateTime>> plannedMap = {};
     for (var session in trainingState.sessions) {
-      for (var phase in session.matrix.values) {
-        for (var slot in phase) {
-          if (slot.eoCode != null) {
-            plannedMap.putIfAbsent(slot.eoCode!, () => []).add(session.date);
-          }
+      // Only count periods planned for the CURRENT phase we are looking at
+      final phaseSlots = session.matrix[widget.phase] ?? [];
+      for (var slot in phaseSlots) {
+        if (slot.eoCode != null) {
+          plannedMap.putIfAbsent(slot.eoCode!, () => []).add(session.date);
         }
       }
     }
@@ -55,9 +59,9 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
-      decoration: const BoxDecoration(
-        color: Color(0xFF1A1A1A),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: Column(
         children: [
@@ -96,7 +100,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
           borderRadius: BorderRadius.circular(2),
         ),
       ),
@@ -117,7 +121,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.gold.withOpacity(0.7),
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
                     letterSpacing: 2,
                   ),
                 ),
@@ -150,9 +154,9 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
               label: Text(cat.toUpperCase(), style: const TextStyle(fontSize: 10)),
               selected: isSelected,
               onSelected: (val) => setState(() => _selectedCategory = cat),
-              selectedColor: AppTheme.gold.withOpacity(0.2),
+              selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
               labelStyle: TextStyle(
-                color: isSelected ? AppTheme.gold : Colors.white38,
+                color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -173,7 +177,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
               hintText: 'Search EO code or title...',
               prefixIcon: const Icon(LucideIcons.search, size: 20),
               filled: true,
-              fillColor: Colors.white.withOpacity(0.05),
+              fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide.none,
@@ -188,7 +192,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildSmallField('Location', LucideIcons.mapPin, (val) => _location = val),
+                child: _buildSmallField('Location', LucideIcons.mapPin, (val) => _locationName = val),
               ),
             ],
           ),
@@ -205,10 +209,20 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
   Widget _buildSmallField(String hint, IconData icon, Function(String) onChanged) {
     if (hint == 'Instructor') {
       final instructors = ref.watch(instructorProvider);
+      final trainingState = ref.watch(trainingProvider);
+      final session = trainingState.sessions.firstWhere((s) => s.id == widget.sessionId);
+      
+      final busyInstructorIds = <String>{};
+      for (var phase in Phase.values) {
+        if (phase == widget.phase) continue;
+        final id = session.matrix[phase]![widget.periodIndex].instructorId;
+        if (id != null) busyInstructorIds.add(id);
+      }
+
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
           borderRadius: BorderRadius.circular(12),
         ),
         child: DropdownButtonHideUnderline(
@@ -216,17 +230,27 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
             isExpanded: true,
             hint: Row(
               children: [
-                Icon(icon, size: 14, color: Colors.white38),
+                Icon(icon, size: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                 const SizedBox(width: 8),
-                Text(hint, style: const TextStyle(fontSize: 12, color: Colors.white38)),
+                Text(hint, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3))),
               ],
             ),
             value: _selectedInstructorId,
-            dropdownColor: AppTheme.black,
-            items: instructors.map((i) => DropdownMenuItem(
-              value: i.id,
-              child: Text(i.displayName, style: const TextStyle(fontSize: 12)),
-            )).toList(),
+            dropdownColor: Theme.of(context).colorScheme.surface,
+            items: instructors.map((i) {
+              final isBusy = busyInstructorIds.contains(i.id);
+              return DropdownMenuItem(
+                value: i.id,
+                child: Text(
+                  i.displayName + (isBusy ? ' (IN USE)' : ''),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isBusy ? Theme.of(context).colorScheme.onSurface.withOpacity(0.2) : Theme.of(context).colorScheme.onSurface,
+                    fontStyle: isBusy ? FontStyle.italic : FontStyle.normal,
+                  ),
+                ),
+              );
+            }).toList(),
             onChanged: (val) {
               if (val != null) {
                 final instructor = instructors.firstWhere((i) => i.id == val);
@@ -243,6 +267,16 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
     
     if (hint == 'Location') {
       final locations = ref.watch(locationProvider);
+      final trainingState = ref.watch(trainingProvider);
+      final session = trainingState.sessions.firstWhere((s) => s.id == widget.sessionId);
+
+      final busyLocationIds = <String>{};
+      for (var phase in Phase.values) {
+        if (phase == widget.phase) continue;
+        final id = session.matrix[phase]![widget.periodIndex].locationId;
+        if (id != null) busyLocationIds.add(id);
+      }
+
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
@@ -261,10 +295,20 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
             ),
             value: _selectedLocationId,
             dropdownColor: AppTheme.black,
-            items: locations.map((l) => DropdownMenuItem(
-              value: l.id,
-              child: Text(l.name, style: const TextStyle(fontSize: 12)),
-            )).toList(),
+            items: locations.map((l) {
+              final isBusy = busyLocationIds.contains(l.id);
+              return DropdownMenuItem(
+                value: l.id,
+                child: Text(
+                  l.name + (isBusy ? ' (IN USE)' : ''),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isBusy ? Theme.of(context).colorScheme.onSurface.withOpacity(0.2) : Theme.of(context).colorScheme.onSurface,
+                    fontStyle: isBusy ? FontStyle.italic : FontStyle.normal,
+                  ),
+                ),
+              );
+            }).toList(),
             onChanged: (val) {
               if (val != null) {
                 final location = locations.firstWhere((l) => l.id == val);
@@ -286,7 +330,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
         hintText: hint,
         prefixIcon: Icon(icon, size: 14),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.05),
+        fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
         isDense: true,
         contentPadding: const EdgeInsets.symmetric(vertical: 12),
         border: OutlineInputBorder(
@@ -317,10 +361,10 @@ class _LessonTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isMaxed ? Colors.white.withOpacity(0.01) : Colors.white.withOpacity(0.03),
+        color: isMaxed ? Theme.of(context).colorScheme.onSurface.withOpacity(0.01) : Theme.of(context).colorScheme.onSurface.withOpacity(0.03),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isMaxed ? Colors.red.withOpacity(0.1) : Colors.white.withOpacity(0.05),
+          color: isMaxed ? Colors.red.withOpacity(0.1) : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
         ),
       ),
       child: ListTile(
@@ -332,13 +376,13 @@ class _LessonTile extends StatelessWidget {
               lesson.code,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: isMaxed ? Colors.white24 : AppTheme.gold,
+                color: isMaxed ? Theme.of(context).colorScheme.onSurface.withOpacity(0.2) : Theme.of(context).colorScheme.primary,
                 fontFamily: 'monospace',
               ),
             ),
             const SizedBox(width: 8),
             if (lesson.isMandatory)
-              Icon(LucideIcons.star, size: 14, color: isMaxed ? Colors.white10 : AppTheme.gold),
+              Icon(LucideIcons.star, size: 14, color: isMaxed ? Theme.of(context).colorScheme.onSurface.withOpacity(0.1) : Theme.of(context).colorScheme.primary),
             const Spacer(),
             if (hasConflict)
               _buildWarningTag('ALREADY PLANNED (${DateFormat('MMM d').format(plannedDates.first)})')
@@ -351,7 +395,7 @@ class _LessonTile extends StatelessWidget {
           child: Text(
             lesson.title,
             style: TextStyle(
-              color: isMaxed ? Colors.white10 : Colors.white70,
+              color: isMaxed ? Theme.of(context).colorScheme.onSurface.withOpacity(0.1) : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               height: 1.3,
             ),
           ),
@@ -359,7 +403,7 @@ class _LessonTile extends StatelessWidget {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(

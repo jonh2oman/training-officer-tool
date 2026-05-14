@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../application/location_controller.dart';
 import '../domain/location.dart';
 import '../../../theme/app_theme.dart';
+import '../../../shared/widgets/glass_container.dart';
 
 class LocationRegistryScreen extends ConsumerWidget {
   const LocationRegistryScreen({super.key});
@@ -46,7 +47,7 @@ class LocationRegistryScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             'NO TRAINING SPACES DEFINED',
-            style: TextStyle(color: Colors.white.withOpacity(0.5), letterSpacing: 1),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), letterSpacing: 1),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -66,8 +67,11 @@ class LocationRegistryScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.black,
-        title: Text(location == null ? 'ADD SPACE' : 'EDIT SPACE', style: const TextStyle(color: AppTheme.gold)),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text(
+          location == null ? 'ADD SPACE' : 'EDIT SPACE', 
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -87,7 +91,7 @@ class LocationRegistryScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('CANCEL', style: TextStyle(color: Colors.white54)),
+            child: Text('CANCEL', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
           ),
           ElevatedButton(
             onPressed: () {
@@ -120,16 +124,17 @@ class _LocationCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
+    return GlassContainer(
+      opacity: 0.05,
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: Colors.white.withOpacity(0.05),
-          child: const Icon(LucideIcons.mapPin, color: AppTheme.gold, size: 20),
+          backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+          child: Icon(LucideIcons.mapPin, color: Theme.of(context).colorScheme.primary, size: 20),
         ),
         title: Text(location.name, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: location.description != null && location.description!.isNotEmpty
-            ? Text(location.description!, style: const TextStyle(fontSize: 10, color: Colors.white38))
+            ? Text(location.description!, style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
             : null,
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

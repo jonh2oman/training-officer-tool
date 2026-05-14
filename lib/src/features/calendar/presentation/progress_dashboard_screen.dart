@@ -3,6 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../domain/training_session.dart';
 import '../../lessons/domain/lesson.dart';
 import '../../../theme/app_theme.dart';
+import '../../../shared/widgets/glass_container.dart';
 
 class ProgressDashboardScreen extends StatelessWidget {
   final List<TrainingSession> sessions;
@@ -19,7 +20,7 @@ class ProgressDashboardScreen extends StatelessWidget {
         Text(
           'YEARLY PROGRESS OVERVIEW',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: AppTheme.gold,
+            color: Theme.of(context).colorScheme.primary,
             letterSpacing: 2,
             fontWeight: FontWeight.bold,
           ),
@@ -45,7 +46,7 @@ class ProgressDashboardScreen extends StatelessWidget {
         Text(
           'MANDATORY LESSON BREAKDOWN',
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: AppTheme.gold,
+            color: Theme.of(context).colorScheme.primary,
             letterSpacing: 2,
             fontWeight: FontWeight.bold,
           ),
@@ -121,13 +122,9 @@ class _PhaseProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassContainer(
+      opacity: 0.05,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.navy.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppTheme.gold.withOpacity(0.1)),
-      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -140,8 +137,8 @@ class _PhaseProgressCard extends StatelessWidget {
                 child: CircularProgressIndicator(
                   value: stats.percentage,
                   strokeWidth: 8,
-                  backgroundColor: Colors.white.withOpacity(0.05),
-                  color: _getColor(),
+                  backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                  color: _getColor(context),
                 ),
               ),
               Text(
@@ -158,16 +155,16 @@ class _PhaseProgressCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             '${stats.scheduled} / ${stats.required} PER',
-            style: TextStyle(fontSize: 10, color: Colors.white.withOpacity(0.5)),
+            style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
           ),
         ],
       ),
     );
   }
 
-  Color _getColor() {
+  Color _getColor(BuildContext context) {
     if (stats.percentage >= 1.0) return Colors.greenAccent;
-    if (stats.percentage >= 0.5) return AppTheme.gold;
+    if (stats.percentage >= 0.5) return Theme.of(context).colorScheme.primary;
     return AppTheme.weekendColor;
   }
 }
@@ -192,26 +189,23 @@ class _PhaseDetailSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Text(
             phase.label,
-            style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.gold),
+            style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
           ),
         ),
         ...lessons.map((lesson) {
           final scheduled = scheduledCounts[lesson.code] ?? 0;
           final isComplete = scheduled >= lesson.periods;
           
-          return Container(
+          return GlassContainer(
+            opacity: 0.02,
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.02),
-              borderRadius: BorderRadius.circular(12),
-            ),
             child: Row(
               children: [
                 Icon(
                   isComplete ? LucideIcons.checkCircle2 : LucideIcons.circle,
                   size: 16,
-                  color: isComplete ? Colors.greenAccent : Colors.white24,
+                  color: isComplete ? Colors.greenAccent : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -220,10 +214,10 @@ class _PhaseDetailSection extends StatelessWidget {
                     children: [
                       Text(
                         '${lesson.code}: ${lesson.title}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isComplete ? Colors.white : Colors.white70,
-                        ),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isComplete ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                          ),
                       ),
                       const SizedBox(height: 4),
                       ClipRRect(
@@ -231,8 +225,8 @@ class _PhaseDetailSection extends StatelessWidget {
                         child: LinearProgressIndicator(
                           value: (scheduled / lesson.periods).clamp(0.0, 1.0),
                           minHeight: 2,
-                          backgroundColor: Colors.white.withOpacity(0.05),
-                          color: isComplete ? Colors.greenAccent : AppTheme.gold.withOpacity(0.5),
+                          backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                          color: isComplete ? Colors.greenAccent : Theme.of(context).colorScheme.primary.withOpacity(0.5),
                         ),
                       ),
                     ],

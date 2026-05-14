@@ -8,6 +8,8 @@ import '../application/training_controller.dart';
 import '../domain/training_session.dart';
 import 'progress_dashboard_screen.dart';
 import '../../../theme/app_theme.dart';
+import '../../../shared/widgets/glass_container.dart';
+import '../application/pdf_service.dart';
 
 enum ViewType { list, calendar, board, dashboard }
 
@@ -45,10 +47,14 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
               children: [
                 DropdownButton<int>(
                   value: trainingState.academicYear,
-                  dropdownColor: AppTheme.black,
+                  dropdownColor: Theme.of(context).colorScheme.surface,
                   underline: const SizedBox(),
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                  icon: const Icon(LucideIcons.chevronDown, size: 16, color: AppTheme.gold),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  icon: Icon(LucideIcons.chevronDown, size: 16, color: Theme.of(context).colorScheme.primary),
                   onChanged: (year) {
                     if (year != null) {
                       ref.read(trainingProvider.notifier).setAcademicYear(year);
@@ -65,14 +71,14 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
                   children: [
                     Text(
                       'CORPS PARADES ON: ',
-                      style: TextStyle(fontSize: 8, color: AppTheme.gold.withOpacity(0.5), letterSpacing: 1),
+                      style: TextStyle(fontSize: 8, color: Theme.of(context).colorScheme.primary.withOpacity(0.5), letterSpacing: 1),
                     ),
                     DropdownButton<int>(
                       value: trainingState.paradeWeekday,
-                      dropdownColor: AppTheme.black,
+                      dropdownColor: Theme.of(context).colorScheme.surface,
                       underline: const SizedBox(),
                       isDense: true,
-                      style: const TextStyle(color: AppTheme.gold, fontWeight: FontWeight.bold, fontSize: 10),
+                      style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 10),
                       onChanged: (day) {
                         if (day != null) {
                           ref.read(trainingProvider.notifier).setParadeWeekday(day);
@@ -110,7 +116,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
               onSelectionChanged: (newView) => setState(() => _currentView = newView.first),
               style: ButtonStyle(
                 visualDensity: VisualDensity.compact,
-                side: WidgetStateProperty.all(BorderSide(color: AppTheme.gold.withOpacity(0.2))),
+                side: WidgetStateProperty.all(BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.2))),
               ),
             ),
           ),
@@ -128,7 +134,8 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
           ),
           IconButton(
             icon: const Icon(LucideIcons.fileText),
-            onPressed: () {}, // Future PDF
+            onPressed: () => _showExportDialog(context, trainingState.sessions),
+            tooltip: 'Export Training Plan',
           ),
         ],
       ),
@@ -192,6 +199,46 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
     );
   }
 
+  void _showExportDialog(BuildContext context, List<TrainingSession> sessions) async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2024, 1, 1),
+      lastDate: DateTime(2030, 12, 31),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: Theme.of(context).colorScheme.primary,
+              onPrimary: Theme.of(context).colorScheme.onPrimary,
+              surface: Theme.of(context).colorScheme.surface,
+              onSurface: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      final filteredSessions = sessions.where((s) => 
+        s.date.isAfter(picked.start.subtract(const Duration(days: 1))) && 
+        s.date.isBefore(picked.end.add(const Duration(days: 1)))
+      ).toList();
+
+      if (filteredSessions.isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No sessions found in this date range')),
+          );
+        }
+        return;
+      }
+
+      final title = 'Training Plan (${DateFormat('dd MMM').format(picked.start)} - ${DateFormat('dd MMM').format(picked.end)})';
+      await PdfService.generateTrainingPlan(filteredSessions, title);
+    }
+  }
+
   Widget _buildCurrentView(dynamic trainingState, Map<String, List<TrainingSession>> groupedSessions) {
     switch (_currentView) {
       case ViewType.list:
@@ -225,7 +272,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
               child: Text(
                 month.toUpperCase(),
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AppTheme.gold,
+                  color: Theme.of(context).colorScheme.primary,
                   letterSpacing: 2,
                 ),
               ),
@@ -266,7 +313,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
       children: [
         Text(
           DateFormat('MMMM yyyy').format(firstDay).toUpperCase(),
-          style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2, color: AppTheme.gold),
+          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2, color: Theme.of(context).colorScheme.primary),
         ),
         const SizedBox(height: 16),
         GridView.builder(
@@ -289,18 +336,30 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
               onTap: session != null ? () => context.push('/planning/${session.id}') : null,
               child: Container(
                 decoration: BoxDecoration(
-                  color: session != null ? AppTheme.navy : Colors.white.withOpacity(0.02),
+                  color: session != null 
+                    ? Theme.of(context).colorScheme.primary.withOpacity(0.2) 
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: session != null ? AppTheme.gold.withOpacity(0.5) : Colors.white.withOpacity(0.05),
+                    color: session != null 
+                      ? Theme.of(context).colorScheme.primary.withOpacity(0.5) 
+                      : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                   ),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('$day', style: TextStyle(fontSize: 10, color: session != null ? Colors.white : Colors.white24)),
+                    Text(
+                      '$day', 
+                      style: TextStyle(
+                        fontSize: 10, 
+                        color: session != null 
+                          ? Theme.of(context).colorScheme.onSurface 
+                          : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                      ),
+                    ),
                     if (session != null)
-                      const Icon(LucideIcons.anchor, size: 10, color: AppTheme.gold),
+                      Icon(LucideIcons.anchor, size: 10, color: Theme.of(context).colorScheme.primary),
                   ],
                 ),
               ),
@@ -338,12 +397,17 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: AppTheme.gold.withOpacity(0.1),
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       entry.key.toUpperCase(),
-                      style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2, color: AppTheme.gold, fontSize: 12),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold, 
+                        letterSpacing: 2, 
+                        color: Theme.of(context).colorScheme.primary, 
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -391,7 +455,8 @@ class _SessionCard extends StatelessWidget {
         break;
     }
 
-    return Card(
+    return GlassContainer(
+      opacity: 0.05,
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: () => context.push('/planning/${session.id}'),
@@ -404,7 +469,7 @@ class _SessionCard extends StatelessWidget {
                 width: 60,
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -415,7 +480,7 @@ class _SessionCard extends StatelessWidget {
                     ),
                     Text(
                       dayName.substring(0, 3).toUpperCase(),
-                      style: const TextStyle(fontSize: 10, color: Colors.white38),
+                      style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                     ),
                   ],
                 ),

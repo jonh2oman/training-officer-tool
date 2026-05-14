@@ -20,6 +20,8 @@ class PlanningMatrixScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => LessonSelectorSheet(
         phase: phase,
+        periodIndex: periodIndex,
+        sessionId: sessionId,
         onSelected: (lesson, instructor, instructorId, location, locationId) {
           ref.read(trainingProvider.notifier).assignLesson(
                 sessionId,
@@ -47,20 +49,20 @@ class PlanningMatrixScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: Colors.white),
+          icon: Icon(LucideIcons.chevronLeft, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Column(
           children: [
             Text(
               DateFormat('EEEE, MMM d, yyyy').format(session.date).toUpperCase(),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
             ),
             Text(
               _getTypeLabel(session.type).toUpperCase(),
               style: TextStyle(
                 fontSize: 10,
-                color: AppTheme.gold.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
                 letterSpacing: 2,
               ),
             ),
@@ -69,14 +71,14 @@ class PlanningMatrixScreen extends ConsumerWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.download, color: AppTheme.gold),
+            icon: Icon(LucideIcons.download, color: Theme.of(context).colorScheme.primary),
             onPressed: () => PdfService.generateRoutineOrder(session),
           ),
         ],
       ),
       body: Column(
         children: [
-          _buildPhaseHeader(),
+          _buildPhaseHeader(context),
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
@@ -92,10 +94,10 @@ class PlanningMatrixScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPhaseHeader() {
+  Widget _buildPhaseHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      color: Colors.white.withOpacity(0.05),
+      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
       child: Row(
         children: [
           const SizedBox(width: 80), // Label space
@@ -104,7 +106,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
               child: Text(
                 phase.label.toUpperCase(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white38),
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
               ),
             ),
         ],
@@ -124,7 +126,12 @@ class PlanningMatrixScreen extends ConsumerWidget {
             quarterTurns: 3,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Colors.white10, letterSpacing: 4),
+              style: TextStyle(
+                fontSize: 12, 
+                fontWeight: FontWeight.w900, 
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1), 
+                letterSpacing: 4
+              ),
             ),
           ),
         ),
@@ -195,9 +202,9 @@ class _LessonSlotCard extends StatelessWidget {
       height: 120,
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.03),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05)),
       ),
       child: InkWell(
         onTap: onTap,
@@ -208,9 +215,16 @@ class _LessonSlotCard extends StatelessWidget {
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(LucideIcons.plus, size: 16, color: Colors.white.withOpacity(0.2)),
+                    Icon(LucideIcons.plus, size: 16, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
                     const SizedBox(height: 4),
-                    const Text('EMPTY', style: TextStyle(fontSize: 8, color: Colors.white10, fontWeight: FontWeight.bold)),
+                    Text(
+                      'EMPTY', 
+                      style: TextStyle(
+                        fontSize: 8, 
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1), 
+                        fontWeight: FontWeight.bold
+                      )
+                    ),
                   ],
                 )
               : Column(
@@ -221,7 +235,7 @@ class _LessonSlotCard extends StatelessWidget {
                       children: [
                         Text(
                           slot.eoCode ?? '',
-                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.gold),
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
                         ),
                         if (instructorConflict || locationConflict)
                           Tooltip(
@@ -252,13 +266,13 @@ class _LessonSlotCard extends StatelessWidget {
                               child: Text(
                                 slot.instructor!,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 8, color: Colors.white38),
+                                style: TextStyle(fontSize: 8, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                               ),
                             ),
                           if (slot.location != null)
                             Text(
                               '@ ${slot.location!}',
-                              style: TextStyle(fontSize: 8, color: AppTheme.gold.withOpacity(0.5)),
+                              style: TextStyle(fontSize: 8, color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
                             ),
                         ],
                       ),
