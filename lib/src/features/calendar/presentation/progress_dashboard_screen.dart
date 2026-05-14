@@ -140,7 +140,7 @@ class _PhaseProgressCard extends StatelessWidget {
                 child: CircularProgressIndicator(
                   value: stats.percentage,
                   strokeWidth: 8,
-                  backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                  backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                   color: _getColor(context),
                 ),
               ),
@@ -158,7 +158,7 @@ class _PhaseProgressCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             '${stats.scheduled} / ${stats.required} PER',
-            style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+            style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
           ),
         ],
       ),
@@ -210,7 +210,7 @@ class _PhaseDetailSection extends StatelessWidget {
                 Icon(
                   isComplete ? LucideIcons.checkCircle2 : LucideIcons.circle,
                   size: 16,
-                  color: isComplete ? Colors.greenAccent : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                  color: isComplete ? Colors.greenAccent : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -221,7 +221,7 @@ class _PhaseDetailSection extends StatelessWidget {
                         '${lesson.code}: ${lesson.title}',
                           style: TextStyle(
                             fontSize: 12,
-                            color: isComplete ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                            color: isComplete ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                       ),
                       const SizedBox(height: 4),
@@ -230,8 +230,8 @@ class _PhaseDetailSection extends StatelessWidget {
                         child: LinearProgressIndicator(
                           value: (scheduled / lesson.periods).clamp(0.0, 1.0),
                           minHeight: 2,
-                          backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
-                          color: isComplete ? Colors.greenAccent : Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                          backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                          color: isComplete ? Colors.greenAccent : Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
                         ),
                       ),
                     ],

@@ -69,7 +69,7 @@ class ChangelogScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.greenAccent.withOpacity(0.2),
+                    color: Colors.greenAccent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Text(
@@ -81,7 +81,7 @@ class ChangelogScreen extends StatelessWidget {
           ),
           Text(
             date.toUpperCase(),
-            style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), letterSpacing: 1),
+            style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3), letterSpacing: 1),
           ),
           const SizedBox(height: 16),
           ...changes.map((change) => Padding(

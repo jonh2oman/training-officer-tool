@@ -73,7 +73,7 @@ class AppTheme {
         seedColor: navy,
         brightness: brightness,
         primary: isDark ? gold : goldDark,
-        secondary: isDark ? gold.withOpacity(0.8) : goldDark.withOpacity(0.8),
+        secondary: isDark ? gold.withValues(alpha: 0.8) : goldDark.withValues(alpha: 0.8),
         surface: surface,
       ),
       scaffoldBackgroundColor: background,
@@ -98,7 +98,7 @@ class AppTheme {
           fontWeight: FontWeight.w600,
         ),
         bodyLarge: TextStyle(color: textPrimary),
-        bodyMedium: TextStyle(color: textPrimary.withOpacity(0.7)),
+        bodyMedium: TextStyle(color: textPrimary.withValues(alpha: 0.7)),
       ),
       cardTheme: ThemeData.dark().cardTheme.copyWith(
         color: surface,
@@ -106,7 +106,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
           side: BorderSide(
-            color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
             width: 1,
           ),
         ),

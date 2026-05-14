@@ -28,7 +28,7 @@ class DashboardScreen extends ConsumerWidget {
               width: 300,
               height: 300,
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.05),
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
             ),
@@ -57,7 +57,7 @@ class DashboardScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
                       letterSpacing: 3,
                     ),
                   ),
@@ -159,7 +159,7 @@ class DashboardScreen extends ConsumerWidget {
           size: 16,
           color: isSelected 
             ? (isDark ? Colors.black : Colors.white) 
-            : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
         ),
       ),
     );
@@ -175,7 +175,7 @@ class DashboardScreen extends ConsumerWidget {
           style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColor.withOpacity(0.5),
+            color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
             letterSpacing: 2,
           ),
         ),
@@ -213,7 +213,7 @@ class DashboardScreen extends ConsumerWidget {
             child: Text(
               'CHANGE LOG',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                 fontSize: 10,
                 letterSpacing: 1,
                 fontWeight: FontWeight.bold,
@@ -341,7 +341,7 @@ class _DashboardCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(icon, color: color, size: 28),
@@ -363,7 +363,7 @@ class _DashboardCard extends StatelessWidget {
                       subtitle,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
+                        color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
                         height: 1.3,
                       ),
                     ),
@@ -373,7 +373,7 @@ class _DashboardCard extends StatelessWidget {
               const SizedBox(width: 16),
               Icon(
                 LucideIcons.chevronRight,
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
               ),
             ],
           ),

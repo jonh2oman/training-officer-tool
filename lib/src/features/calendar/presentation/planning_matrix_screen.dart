@@ -62,7 +62,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
               _getTypeLabel(session.type).toUpperCase(),
               style: TextStyle(
                 fontSize: 10,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
                 letterSpacing: 2,
               ),
             ),
@@ -78,7 +78,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          _buildPhaseHeader(context),
+          _buildPhaseHeader(context, ref),
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
@@ -94,10 +94,10 @@ class PlanningMatrixScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPhaseHeader(BuildContext context) {
+  Widget _buildPhaseHeader(BuildContext context, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
       child: Row(
         children: [
           const SizedBox(width: 80), // Label space
@@ -106,7 +106,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
               child: Text(
                 phase.getLabel(ref.watch(trainingProvider).selectedElement).toUpperCase(),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
               ),
             ),
         ],
@@ -129,7 +129,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 12, 
                 fontWeight: FontWeight.w900, 
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1), 
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), 
                 letterSpacing: 4
               ),
             ),
@@ -202,9 +202,9 @@ class _LessonSlotCard extends StatelessWidget {
       height: 120,
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.03),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05)),
       ),
       child: InkWell(
         onTap: onTap,
@@ -215,13 +215,13 @@ class _LessonSlotCard extends StatelessWidget {
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(LucideIcons.plus, size: 16, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
+                    Icon(LucideIcons.plus, size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
                     const SizedBox(height: 4),
                     Text(
                       'EMPTY', 
                       style: TextStyle(
                         fontSize: 8, 
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1), 
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), 
                         fontWeight: FontWeight.bold
                       )
                     ),
@@ -266,13 +266,13 @@ class _LessonSlotCard extends StatelessWidget {
                               child: Text(
                                 slot.instructor!,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 8, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                                style: TextStyle(fontSize: 8, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                               ),
                             ),
                           if (slot.location != null)
                             Text(
                               '@ ${slot.location!}',
-                              style: TextStyle(fontSize: 8, color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
+                              style: TextStyle(fontSize: 8, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
                             ),
                         ],
                       ),

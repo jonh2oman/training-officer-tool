@@ -43,11 +43,11 @@ class LocationRegistryScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(LucideIcons.mapPin, size: 64, color: AppTheme.gold.withOpacity(0.2)),
+          Icon(LucideIcons.mapPin, size: 64, color: AppTheme.gold.withValues(alpha: 0.2)),
           const SizedBox(height: 16),
           Text(
             'NO TRAINING SPACES DEFINED',
-            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), letterSpacing: 1),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), letterSpacing: 1),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -91,7 +91,7 @@ class LocationRegistryScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('CANCEL', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
+            child: Text('CANCEL', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))),
           ),
           ElevatedButton(
             onPressed: () {
@@ -129,12 +129,12 @@ class _LocationCard extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+          backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
           child: Icon(LucideIcons.mapPin, color: Theme.of(context).colorScheme.primary, size: 20),
         ),
         title: Text(location.name, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: location.description != null && location.description!.isNotEmpty
-            ? Text(location.description!, style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)))
+            ? Text(location.description!, style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)))
             : null,
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

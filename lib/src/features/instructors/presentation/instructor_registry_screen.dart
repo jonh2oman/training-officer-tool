@@ -43,11 +43,11 @@ class InstructorRegistryScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(LucideIcons.users, size: 64, color: AppTheme.gold.withOpacity(0.2)),
+          Icon(LucideIcons.users, size: 64, color: AppTheme.gold.withValues(alpha: 0.2)),
           const SizedBox(height: 16),
           Text(
             'NO INSTRUCTORS REGISTRY',
-            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), letterSpacing: 1),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), letterSpacing: 1),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -100,7 +100,7 @@ class InstructorRegistryScreen extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('CANCEL', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
+              child: Text('CANCEL', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))),
             ),
             ElevatedButton(
               onPressed: () {
@@ -141,20 +141,20 @@ class _InstructorCard extends ConsumerWidget {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: instructor.isStaff 
-            ? Theme.of(context).colorScheme.primary.withOpacity(0.1) 
-            : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1) 
+            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
           child: Icon(
             instructor.isStaff ? LucideIcons.shieldCheck : LucideIcons.user,
             color: instructor.isStaff 
               ? Theme.of(context).colorScheme.primary 
-              : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
             size: 20,
           ),
         ),
         title: Text(instructor.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(
           instructor.isStaff ? 'Adult Staff' : 'Senior Cadet', 
-          style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4)),
+          style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

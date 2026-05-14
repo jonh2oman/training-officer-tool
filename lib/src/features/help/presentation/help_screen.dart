@@ -46,7 +46,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 decoration: InputDecoration(
                   hintText: 'Search documentation...',
                   border: InputBorder.none,
-                  icon: Icon(LucideIcons.search, size: 18, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                  icon: Icon(LucideIcons.search, size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                 ),
               ),
             ),
@@ -94,7 +94,7 @@ class _HelpTopicCard extends StatelessWidget {
           Text(
             topic.content,
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               height: 1.5,
               fontSize: 14,
             ),

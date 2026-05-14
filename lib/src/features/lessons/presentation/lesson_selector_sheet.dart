@@ -100,7 +100,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(2),
         ),
       ),
@@ -121,7 +121,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
                     letterSpacing: 2,
                   ),
                 ),
@@ -154,9 +154,9 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
               label: Text(cat.toUpperCase(), style: const TextStyle(fontSize: 10)),
               selected: isSelected,
               onSelected: (val) => setState(() => _selectedCategory = cat),
-              selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
               labelStyle: TextStyle(
-                color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -177,7 +177,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
               hintText: 'Search EO code or title...',
               prefixIcon: const Icon(LucideIcons.search, size: 20),
               filled: true,
-              fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+              fillColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide.none,
@@ -222,7 +222,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
         ),
         child: DropdownButtonHideUnderline(
@@ -230,9 +230,9 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
             isExpanded: true,
             hint: Row(
               children: [
-                Icon(icon, size: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                Icon(icon, size: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                 const SizedBox(width: 8),
-                Text(hint, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3))),
+                Text(hint, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3))),
               ],
             ),
             value: _selectedInstructorId,
@@ -245,7 +245,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
                   i.displayName + (isBusy ? ' (IN USE)' : ''),
                   style: TextStyle(
                     fontSize: 12,
-                    color: isBusy ? Theme.of(context).colorScheme.onSurface.withOpacity(0.2) : Theme.of(context).colorScheme.onSurface,
+                    color: isBusy ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2) : Theme.of(context).colorScheme.onSurface,
                     fontStyle: isBusy ? FontStyle.italic : FontStyle.normal,
                   ),
                 ),
@@ -280,7 +280,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
         ),
         child: DropdownButtonHideUnderline(
@@ -303,7 +303,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
                   l.name + (isBusy ? ' (IN USE)' : ''),
                   style: TextStyle(
                     fontSize: 12,
-                    color: isBusy ? Theme.of(context).colorScheme.onSurface.withOpacity(0.2) : Theme.of(context).colorScheme.onSurface,
+                    color: isBusy ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2) : Theme.of(context).colorScheme.onSurface,
                     fontStyle: isBusy ? FontStyle.italic : FontStyle.normal,
                   ),
                 ),
@@ -330,7 +330,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
         hintText: hint,
         prefixIcon: Icon(icon, size: 14),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+        fillColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         isDense: true,
         contentPadding: const EdgeInsets.symmetric(vertical: 12),
         border: OutlineInputBorder(
@@ -361,10 +361,10 @@ class _LessonTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isMaxed ? Theme.of(context).colorScheme.onSurface.withOpacity(0.01) : Theme.of(context).colorScheme.onSurface.withOpacity(0.03),
+        color: isMaxed ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.01) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isMaxed ? Colors.red.withOpacity(0.1) : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+          color: isMaxed ? Colors.red.withValues(alpha: 0.1) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         ),
       ),
       child: ListTile(
@@ -376,13 +376,13 @@ class _LessonTile extends StatelessWidget {
               lesson.code,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: isMaxed ? Theme.of(context).colorScheme.onSurface.withOpacity(0.2) : Theme.of(context).colorScheme.primary,
+                color: isMaxed ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2) : Theme.of(context).colorScheme.primary,
                 fontFamily: 'monospace',
               ),
             ),
             const SizedBox(width: 8),
             if (lesson.isMandatory)
-              Icon(LucideIcons.star, size: 14, color: isMaxed ? Theme.of(context).colorScheme.onSurface.withOpacity(0.1) : Theme.of(context).colorScheme.primary),
+              Icon(LucideIcons.star, size: 14, color: isMaxed ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1) : Theme.of(context).colorScheme.primary),
             const Spacer(),
             if (hasConflict)
               _buildWarningTag('ALREADY PLANNED (${DateFormat('MMM d').format(plannedDates.first)})')
@@ -395,7 +395,7 @@ class _LessonTile extends StatelessWidget {
           child: Text(
             lesson.title,
             style: TextStyle(
-              color: isMaxed ? Theme.of(context).colorScheme.onSurface.withOpacity(0.1) : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: isMaxed ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               height: 1.3,
             ),
           ),
@@ -403,7 +403,7 @@ class _LessonTile extends StatelessWidget {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
@@ -419,7 +419,7 @@ class _LessonTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.2),
+        color: Colors.red.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
@@ -433,7 +433,7 @@ class _LessonTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.2),
+        color: Colors.blue.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(

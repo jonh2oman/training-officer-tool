@@ -71,7 +71,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
                   children: [
                     Text(
                       'CORPS PARADES ON: ',
-                      style: TextStyle(fontSize: 8, color: Theme.of(context).colorScheme.primary.withOpacity(0.5), letterSpacing: 1),
+                      style: TextStyle(fontSize: 8, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5), letterSpacing: 1),
                     ),
                     DropdownButton<int>(
                       value: trainingState.paradeWeekday,
@@ -116,7 +116,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
               onSelectionChanged: (newView) => setState(() => _currentView = newView.first),
               style: ButtonStyle(
                 visualDensity: VisualDensity.compact,
-                side: WidgetStateProperty.all(BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.2))),
+                side: WidgetStateProperty.all(BorderSide(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2))),
               ),
             ),
           ),
@@ -338,13 +338,13 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
               child: Container(
                 decoration: BoxDecoration(
                   color: session != null 
-                    ? Theme.of(context).colorScheme.primary.withOpacity(0.2) 
-                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.02),
+                    ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2) 
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.02),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: session != null 
-                      ? Theme.of(context).colorScheme.primary.withOpacity(0.5) 
-                      : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5) 
+                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                   ),
                 ),
                 child: Column(
@@ -356,7 +356,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
                         fontSize: 10, 
                         color: session != null 
                           ? Theme.of(context).colorScheme.onSurface 
-                          : Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                       ),
                     ),
                     if (session != null)
@@ -398,7 +398,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -470,7 +470,7 @@ class _SessionCard extends StatelessWidget {
                 width: 60,
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -481,7 +481,7 @@ class _SessionCard extends StatelessWidget {
                     ),
                     Text(
                       dayName.substring(0, 3).toUpperCase(),
-                      style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                      style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                     ),
                   ],
                 ),
@@ -508,7 +508,7 @@ class _SessionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(typeIcon, color: typeColor.withOpacity(0.5), size: 20),
+              Icon(typeIcon, color: typeColor.withValues(alpha: 0.5), size: 20),
             ],
           ),
         ),

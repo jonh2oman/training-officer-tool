@@ -35,7 +35,7 @@ class ElementSelectorDialog extends ConsumerWidget {
               'Customize your experience',
               style: TextStyle(
                 fontSize: 14,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 32),
@@ -77,7 +77,7 @@ class ElementSelectorDialog extends ConsumerWidget {
               child: Text(
                 'CLOSE',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                   fontWeight: FontWeight.bold,
                   letterSpacing: 2,
                 ),
@@ -116,13 +116,13 @@ class ElementSelectorDialog extends ConsumerWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isSelected 
-              ? accentColor.withOpacity(0.2) 
-              : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+              ? accentColor.withValues(alpha: 0.2) 
+              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected 
                 ? accentColor 
-                : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -131,7 +131,7 @@ class ElementSelectorDialog extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isSelected ? accentColor : accentColor.withOpacity(0.1),
+                color: isSelected ? accentColor : accentColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -157,7 +157,7 @@ class ElementSelectorDialog extends ConsumerWidget {
                     subtitle,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
