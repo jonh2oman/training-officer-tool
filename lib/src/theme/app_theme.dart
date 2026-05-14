@@ -75,7 +75,6 @@ class AppTheme {
         primary: isDark ? gold : goldDark,
         secondary: isDark ? gold.withOpacity(0.8) : goldDark.withOpacity(0.8),
         surface: surface,
-        surface: background,
       ),
       scaffoldBackgroundColor: background,
       textTheme: GoogleFonts.interTextTheme(
