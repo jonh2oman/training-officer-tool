@@ -186,6 +186,36 @@ class DashboardScreen extends ConsumerWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                ref.watch(trainingProvider).selectedElement == CadetElement.sea ? LucideIcons.anchor :
+                ref.watch(trainingProvider).selectedElement == CadetElement.army ? LucideIcons.mountain :
+                LucideIcons.plane,
+                size: 14,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                ref.watch(trainingProvider).selectedElement.name.toUpperCase() + ' BRANCH',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                  letterSpacing: 2,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

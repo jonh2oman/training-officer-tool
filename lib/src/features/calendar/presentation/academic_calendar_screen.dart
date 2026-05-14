@@ -360,7 +360,13 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
                       ),
                     ),
                     if (session != null)
-                      Icon(LucideIcons.anchor, size: 10, color: Theme.of(context).colorScheme.primary),
+                      Icon(
+                        trainingState.selectedElement == CadetElement.sea ? LucideIcons.anchor :
+                        trainingState.selectedElement == CadetElement.army ? LucideIcons.mountain :
+                        LucideIcons.plane,
+                        size: 10, 
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                   ],
                 ),
               ),
@@ -501,9 +507,9 @@ class _SessionCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Training Night - Planning Pending',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    Text(
+                      '${session.type == SessionType.paradeNight ? 'Training Night' : _getTypeLabel(session.type)} - ${session.isFullyPlanned ? 'Fully Planned' : 'Planning Pending'}',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),

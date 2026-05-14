@@ -126,8 +126,25 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
                   ),
                 ),
                 Text(
-                  widget.phase.getLabel(ref.watch(trainingProvider).selectedElement).toUpperCase(),
+                  widget.phase.getLabel(trainingState.selectedElement).toUpperCase(),
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    trainingState.selectedElement.name.toUpperCase() + ' CURRICULUM',
+                    style: TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                      letterSpacing: 1,
+                    ),
+                  ),
                 ),
               ],
             ),
