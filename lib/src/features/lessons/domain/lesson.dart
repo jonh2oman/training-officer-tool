@@ -319,7 +319,7 @@ class LessonLibrary {
     // ==========================================
     // OPTIONAL / CORPS ACTIVITIES (Across all phases)
     // ==========================================
-    ...Phase.values.expand((p) => [
+    ...Phase.values.expand((p) => <Lesson>[
       Lesson(code: 'OPT-DRILL-P${p.index + 1}', title: 'Drill Team Practice', phase: p, periods: 20, category: 'Optional'),
       Lesson(code: 'OPT-MUSIC-P${p.index + 1}', title: 'Music Practice', phase: p, periods: 20, category: 'Optional'),
       Lesson(code: 'OPT-MARK-P${p.index + 1}', title: 'Marksmanship Practice', phase: p, periods: 20, category: 'Optional'),
@@ -327,24 +327,24 @@ class LessonLibrary {
       Lesson(code: 'OPT-ORIENT-P${p.index + 1}', title: 'Orienteering Practice', phase: p, periods: 10, category: 'Optional'),
       Lesson(code: 'OPT-BOAT-P${p.index + 1}', title: 'Model Boat Club', phase: p, periods: 10, category: 'Optional'),
       Lesson(code: 'OPT-SEAM-P${p.index + 1}', title: 'Seamanship Team Practice', phase: p, periods: 20, category: 'Optional'),
-      Lesson(code: 'EVT-HALW-P${p.index + 1}', title: 'Hallowe\'en Costume Dance', phase: p, periods: 3, category: 'Optional'),
+      Lesson(code: 'EVT-HALW-P${p.index + 1}', title: "Hallowe'en Costume Dance", phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-POPPY-P${p.index + 1}', title: 'Poppy Campaign', phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-REMB-P${p.index + 1}', title: 'Remembrance Day Visit', phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-XMAS-P${p.index + 1}', title: 'Christmas Mess Dinner', phase: p, periods: 3, category: 'Optional'),
-      Lesson(code: 'EVT-CAROL-P${p.index + 1}', title: 'Caroling at Veterans\' Home', phase: p, periods: 3, category: 'Optional'),
+      Lesson(code: 'EVT-CAROL-P${p.index + 1}', title: "Caroling at Veterans' Home", phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-SANTA-P${p.index + 1}', title: 'Santa Claus Parade', phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-TREAS-P${p.index + 1}', title: 'Treasure Hunt Day', phase: p, periods: 1, category: 'Optional'),
       Lesson(code: 'EVT-ANML-P${p.index + 1}', title: 'Volunteering at Animal Shelter', phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-SWIM-P${p.index + 1}', title: 'Swimming night', phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-PIRAT-P${p.index + 1}', title: 'Pirate Sports Day', phase: p, periods: 1, category: 'Optional'),
-      Lesson(code: 'EVT-VALNT-P${p.index + 1}', title: 'Valentine\'s Skating Party', phase: p, periods: 3, category: 'Optional'),
+      Lesson(code: 'EVT-VALNT-P${p.index + 1}', title: "Valentine's Skating Party", phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-YOGA-P${p.index + 1}', title: 'Yoga day', phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-MOVIE-P${p.index + 1}', title: 'Movie night', phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-GEOC-P${p.index + 1}', title: 'Geocaching', phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-RELAY-P${p.index + 1}', title: 'Charity Relay', phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-MUSE-P${p.index + 1}', title: 'Maritime Museum Tour', phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-BARBQ-P${p.index + 1}', title: 'End-of-Year Barbecue', phase: p, periods: 3, category: 'Optional'),
-    ]),
+    ]).toList(),
   ];
 
   static List<Lesson> getLessonsForPhase(Phase phase) {
