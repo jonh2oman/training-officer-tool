@@ -6,6 +6,9 @@ import '../../../theme/app_theme.dart';
 import '../../../theme/theme_controller.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/element_selector_dialog.dart';
+import '../application/backup_service.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -95,6 +98,14 @@ class DashboardScreen extends ConsumerWidget {
                             context: context,
                             builder: (context) => const ElementSelectorDialog(),
                           ),
+                        ),
+                        const SizedBox(height: 16),
+                        _DashboardCard(
+                          title: 'Backup & Sync',
+                          subtitle: 'Export or import your planning data',
+                          icon: LucideIcons.database,
+                          color: Colors.amber,
+                          onTap: () => _showBackupOptions(context),
                         ),
                       ],
                     ),
@@ -210,6 +221,92 @@ class DashboardScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showBackupOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => GlassContainer(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        child: Container(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'DATA BACKUP & SYNC',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                ),
+              ),
+              const SizedBox(height: 32),
+              ListTile(
+                leading: const Icon(LucideIcons.uploadCloud, color: Colors.blue),
+                title: const Text('Export Backup'),
+                subtitle: const Text('Save your current data to a file'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await BackupService.exportBackup();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Backup exported successfully')),
+                    );
+                  }
+                },
+              ),
+              const Divider(height: 32),
+              ListTile(
+                leading: const Icon(LucideIcons.downloadCloud, color: Colors.orange),
+                title: const Text('Import Backup'),
+                subtitle: const Text('Restore data from a file (Overwrites current data)'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Overwrite Local Data?'),
+                      content: const Text(
+                        'This will replace all your current sessions, instructors, and locations with the data from the backup file. This cannot be undone.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('CANCEL'),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('OVERWRITE'),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (confirm == true) {
+                    final success = await BackupService.importBackup();
+                    if (context.mounted) {
+                      if (success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Backup imported! Please restart the app.')),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Import failed or cancelled')),
+                        );
+                      }
+                    }
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
       ),
     );
   }
