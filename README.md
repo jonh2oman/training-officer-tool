@@ -21,8 +21,6 @@ https://jonh2oman.github.io/training-officer-tool/
 
 # ⚓ Training Officer Tool (TOT)
 
-![Training Officer Tool Banner](assets/images/banner.png)
-
 ## 📋 Overview
 
 The **Training Officer Tool (TOT)** is a premium, high-fidelity Flutter application designed specifically for Sea Cadet Corps Training Officers. It streamlines the complex task of scheduling, resource management, and reporting, allowing officers to focus on what matters most: delivering high-quality training to cadets.
@@ -117,7 +115,7 @@ Contributions are welcome! If you have suggestions for new features or find any 
 
 ## 📜 License
 
-This project is proprietary and intended for use by Canadian Sea Cadet Corps. 
+This project is proprietary and intended for use by Canadian Cadet Corps and Squadrons. This is an unofficial tool and is not sponsoored or endorsed by DND or the CCO. 
 
 ---
 
