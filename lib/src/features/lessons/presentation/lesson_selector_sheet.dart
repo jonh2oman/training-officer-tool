@@ -137,7 +137,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    trainingState.selectedElement.name.toUpperCase() + ' CURRICULUM',
+                    trainingState.selectedElement.label.toUpperCase() + ' CURRICULUM',
                     style: TextStyle(
                       fontSize: 8,
                       fontWeight: FontWeight.bold,
@@ -258,13 +258,31 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
               final isBusy = busyInstructorIds.contains(i.id);
               return DropdownMenuItem(
                 value: i.id,
-                child: Text(
-                  i.displayName + (isBusy ? ' (IN USE)' : ''),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isBusy ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2) : Theme.of(context).colorScheme.onSurface,
-                    fontStyle: isBusy ? FontStyle.italic : FontStyle.normal,
-                  ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        i.displayName + (isBusy ? ' (IN USE)' : ''),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isBusy ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2) : Theme.of(context).colorScheme.onSurface,
+                          fontStyle: isBusy ? FontStyle.italic : FontStyle.normal,
+                        ),
+                      ),
+                    ),
+                    if (i.qualifiedEOs.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppTheme.gold.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '${i.qualifiedEOs.length} EO',
+                          style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: AppTheme.gold),
+                        ),
+                      ),
+                  ],
                 ),
               );
             }).toList(),

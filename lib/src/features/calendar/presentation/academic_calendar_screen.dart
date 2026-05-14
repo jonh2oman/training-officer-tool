@@ -123,6 +123,88 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.auto_awesome, color: Colors.amber),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('AUTO-PLAN TOOLS'),
+                  content: const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'AUTO-PLAN',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Automatically distributes remaining Mandatory Fundamental lessons across empty slots, interleaved across subjects so no single topic dominates consecutive nights.',
+                        style: TextStyle(fontSize: 13),
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'CLEAR ALL LESSONS',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1, color: Colors.red),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Removes all planned lessons from every session, resetting the calendar to blank. Your sessions and dates are preserved.',
+                        style: TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('CANCEL'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('CLEAR ALL LESSONS?'),
+                            content: const Text('This will remove every planned lesson from your schedule. This cannot be undone. Are you sure?'),
+                            actions: [
+                              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
+                              ElevatedButton(
+                                onPressed: () {
+                                  ref.read(trainingProvider.notifier).clearAllLessons();
+                                  Navigator.pop(ctx);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('All lessons cleared. Schedule is now blank.')),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                                child: const Text('CLEAR ALL'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                      child: const Text('CLEAR LESSONS'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        ref.read(trainingProvider.notifier).batchAutoPlan();
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Auto-plan complete! Fundamental lessons distributed.'))
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.gold, foregroundColor: AppTheme.black),
+                      child: const Text('AUTO-PLAN NOW'),
+                    ),
+                  ],
+                ),
+              );
+            },
+            tooltip: 'Auto-Plan Tools',
+          ),
+          IconButton(
             icon: const Icon(LucideIcons.users),
             onPressed: () => context.push('/instructors'),
             tooltip: 'Instructor Registry',
@@ -420,11 +502,43 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
                   ),
                   const SizedBox(height: 24),
                   Expanded(
-                    child: ListView(
-                      children: entry.value.map((s) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _SessionCard(session: s),
-                      )).toList(),
+                    child: DragTarget<TrainingSession>(
+                      onWillAcceptWithDetails: (details) => details.data.id != 'drag-target', // Always accept for now
+                      onAcceptWithDetails: (details) {
+                        final session = details.data;
+                        final targetMonthStr = entry.key; // e.g. "October 2026"
+                        final targetDate = DateFormat('MMMM yyyy').parse(targetMonthStr);
+                        
+                        // Try to keep the same day of month, or same weekday
+                        DateTime newDate;
+                        if (session.type == SessionType.paradeNight) {
+                          // Find the first occurrence of that weekday in the target month
+                          newDate = DateTime(targetDate.year, targetDate.month, 1);
+                          while (newDate.weekday != session.date.weekday) {
+                            newDate = newDate.add(const Duration(days: 1));
+                          }
+                        } else {
+                          newDate = DateTime(targetDate.year, targetDate.month, session.date.day.clamp(1, 28));
+                        }
+                        
+                        ref.read(trainingProvider.notifier).moveSession(session.id, newDate);
+                      },
+                      builder: (context, candidateData, rejectedData) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: candidateData.isNotEmpty 
+                                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1) 
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: ListView(
+                            children: entry.value.map((s) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _SessionCard(session: s),
+                            )).toList(),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -443,6 +557,24 @@ class _SessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return LongPressDraggable<TrainingSession>(
+      data: session,
+      feedback: Material(
+        color: Colors.transparent,
+        child: SizedBox(
+          width: 300,
+          child: _buildCard(context, isDragging: true),
+        ),
+      ),
+      childWhenDragging: Opacity(
+        opacity: 0.3,
+        child: _buildCard(context),
+      ),
+      child: _buildCard(context),
+    );
+  }
+
+  Widget _buildCard(BuildContext context, {bool isDragging = false}) {
     final dayName = DateFormat('EEEE').format(session.date);
     final dayNum = DateFormat('dd').format(session.date);
     
@@ -467,7 +599,7 @@ class _SessionCard extends StatelessWidget {
       opacity: 0.05,
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => context.push('/planning/${session.id}'),
+        onTap: isDragging ? null : () => context.push('/planning/${session.id}'),
         borderRadius: BorderRadius.circular(24),
         child: Padding(
           padding: const EdgeInsets.all(16.0),

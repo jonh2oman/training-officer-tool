@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../shared/utils/file_saver_mobile.dart' if (dart.library.html) '../../../shared/utils/file_saver_web.dart';
 
 class BackupService {
   static const List<String> _keys = [
@@ -9,10 +10,12 @@ class BackupService {
     'selected_cadet_element',
     'instructor_data_v1',
     'location_data_v1',
+    'app_theme_mode',
   ];
 
   /// Exports all relevant SharedPreferences data to a JSON file.
-  static Future<void> exportBackup() async {
+  /// Returns true if data was found and exported, false if no data was found.
+  static Future<bool> exportBackup() async {
     final prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> backupData = {};
 
@@ -23,14 +26,18 @@ class BackupService {
       }
     }
 
+    if (backupData.isEmpty) {
+      return false;
+    }
+
     final String jsonString = jsonEncode(backupData);
     final Uint8List bytes = Uint8List.fromList(utf8.encode(jsonString));
 
-    final String timestamp = DateTime.now().toIso8601String().split('T')[0];
-    await FilePicker.platform.saveFile(
-      fileName: 'training_officer_backup_$timestamp.json',
-      bytes: bytes,
-    );
+    final String timestamp = DateTime.now().toIso8601String().split('T')[0].replaceAll('-', '');
+    final fileName = 'training_officer_backup_$timestamp.json';
+    
+    await FileSaverImpl().saveFile(fileName, bytes);
+    return true;
   }
 
   /// Imports data from a JSON file and updates SharedPreferences.

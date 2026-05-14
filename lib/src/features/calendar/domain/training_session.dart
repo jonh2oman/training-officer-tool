@@ -161,20 +161,38 @@ class TrainingSession {
   Map<String, dynamic> toJson() => {
     'id': id,
     'date': date.toIso8601String(),
-    'type': type.name,
+    'type': type.index,
     'description': description,
     'dutyOfficer': dutyOfficer,
     'dutyNCO': dutyNCO,
     'dress': dress,
     'announcements': announcements,
-    'matrix': matrix.map((key, value) => MapEntry(key.name, value.map((e) => e.toJson()).toList())),
+    'matrix': matrix.map((key, value) => MapEntry(key.index.toString(), value.map((e) => e.toJson()).toList())),
   };
 
   factory TrainingSession.fromJson(Map<String, dynamic> json) {
+    // Migration helper for enum values (string to int)
+    SessionType parseType(dynamic val) {
+      if (val is int && val < SessionType.values.length) return SessionType.values[val];
+      return SessionType.values.firstWhere(
+        (e) => e.toString().split('.').last == val || e.toString() == val,
+        orElse: () => SessionType.paradeNight,
+      );
+    }
+
+    Phase parsePhase(String key) {
+      final val = int.tryParse(key);
+      if (val != null && val < Phase.values.length) return Phase.values[val];
+      return Phase.values.firstWhere(
+        (e) => e.toString().split('.').last == key || e.toString() == key,
+        orElse: () => Phase.values.first,
+      );
+    }
+
     return TrainingSession(
       id: json['id'],
       date: DateTime.parse(json['date']),
-      type: SessionType.values.byName(json['type']),
+      type: parseType(json['type']),
       description: json['description'],
       dutyOfficer: json['dutyOfficer'],
       dutyNCO: json['dutyNCO'],
@@ -182,7 +200,7 @@ class TrainingSession {
       announcements: json['announcements'],
       matrix: (json['matrix'] as Map<String, dynamic>).map(
         (key, value) => MapEntry(
-          Phase.values.byName(key),
+          parsePhase(key),
           (value as List).map((e) => LessonSlot.fromJson(e)).toList(),
         ),
       ),

@@ -48,6 +48,21 @@ class InstructorController extends StateNotifier<List<Instructor>> {
     await _save();
   }
 
+  Future<void> toggleQualification(String instructorId, String eoCode) async {
+    state = [
+      for (final i in state)
+        if (i.id == instructorId)
+          i.copyWith(
+            qualifiedEOs: i.qualifiedEOs.contains(eoCode)
+                ? (List<String>.from(i.qualifiedEOs)..remove(eoCode))
+                : (List<String>.from(i.qualifiedEOs)..add(eoCode)),
+          )
+        else
+          i
+    ];
+    await _save();
+  }
+
   Future<void> deleteInstructor(String id) async {
     state = state.where((i) => i.id != id).toList();
     await _save();

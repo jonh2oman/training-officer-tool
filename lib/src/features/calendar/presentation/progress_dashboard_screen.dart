@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../domain/training_session.dart';
 import '../../lessons/domain/lesson.dart';
@@ -43,6 +44,28 @@ class ProgressDashboardScreen extends StatelessWidget {
             return _PhaseProgressCard(phase: phase, stats: stats, selectedElement: selectedElement);
           },
         ),
+        const SizedBox(height: 32),
+        Text(
+          'INSTRUCTOR LOAD DISTRIBUTION',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+            color: Theme.of(context).colorScheme.primary,
+            letterSpacing: 2,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildInstructorStats(),
+        const SizedBox(height: 32),
+        Text(
+          'PLANNING GAPS',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+            color: Theme.of(context).colorScheme.primary,
+            letterSpacing: 2,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildGapAnalysis(context),
         const SizedBox(height: 32),
         Text(
           'MANDATORY LESSON BREAKDOWN',
@@ -107,6 +130,94 @@ class ProgressDashboardScreen extends StatelessWidget {
       }
     }
     return counts;
+  }
+
+  Widget _buildInstructorStats() {
+    final Map<String, int> distribution = {};
+    for (var session in sessions) {
+      for (var list in session.matrix.values) {
+        for (var slot in list) {
+          if (slot.instructor != null) {
+            distribution[slot.instructor!] = (distribution[slot.instructor!] ?? 0) + 1;
+          }
+        }
+      }
+    }
+
+    if (distribution.isEmpty) {
+      return const Center(child: Text('No instructors assigned yet.', style: TextStyle(fontSize: 12, color: Colors.grey)));
+    }
+
+    final sortedKeys = distribution.keys.toList()..sort((a, b) => distribution[b]!.compareTo(distribution[a]!));
+    final maxPeriods = distribution[sortedKeys.first]!;
+
+    return Column(
+      children: sortedKeys.take(5).map((name) {
+        final count = distribution[name]!;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Row(
+            children: [
+              SizedBox(width: 100, child: Text(name, style: const TextStyle(fontSize: 10, overflow: TextOverflow.ellipsis))),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: count / maxPeriods,
+                    minHeight: 8,
+                    backgroundColor: Colors.white.withValues(alpha: 0.05),
+                    color: AppTheme.gold.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text('$count P', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildGapAnalysis(BuildContext context) {
+    final List<TrainingSession> gaps = [];
+    for (var session in sessions) {
+      bool hasAnyLesson = false;
+      for (var list in session.matrix.values) {
+        if (list.any((s) => s.eoCode != null)) {
+          hasAnyLesson = true;
+          break;
+        }
+      }
+      if (!hasAnyLesson) gaps.add(session);
+    }
+
+    if (gaps.isEmpty) {
+      return const Center(child: Text('No empty training sessions found! Excellent planning.', style: TextStyle(fontSize: 12, color: Colors.greenAccent)));
+    }
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: gaps.take(10).map((s) {
+          return GlassContainer(
+            opacity: 0.05,
+            margin: const EdgeInsets.only(right: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.calendarX2, size: 12, color: AppTheme.weekendColor),
+                const SizedBox(width: 8),
+                Text(
+                  '${DateFormat('MMM d').format(s.date)}: Unplanned',
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 }
 

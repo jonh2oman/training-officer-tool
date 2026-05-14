@@ -6,6 +6,9 @@ import '../application/training_controller.dart';
 import '../domain/training_session.dart';
 import '../../../theme/app_theme.dart';
 import '../../lessons/presentation/lesson_selector_sheet.dart';
+import '../../lessons/domain/lesson.dart';
+import '../../instructors/application/instructor_controller.dart';
+import '../../instructors/domain/instructor.dart';
 import '../application/pdf_service.dart';
 
 class PlanningMatrixScreen extends ConsumerWidget {
@@ -232,11 +235,23 @@ class PlanningMatrixScreen extends ConsumerWidget {
               slot: session.matrix[phase]![periodIndex],
               instructorConflict: _checkForInstructorConflict(session, periodIndex, phase),
               locationConflict: _checkForLocationConflict(session, periodIndex, phase),
+              qualificationConflict: _checkForQualificationConflict(ref, session, phase, periodIndex),
               onTap: () => _showLessonSelector(context, ref, phase, periodIndex),
             ),
           ),
       ],
     );
+  }
+
+  bool _checkForQualificationConflict(WidgetRef ref, TrainingSession session, Phase phase, int periodIndex) {
+    final slot = session.matrix[phase]![periodIndex];
+    if (slot.instructorId == null || slot.eoCode == null) return false;
+
+    final instructors = ref.read(instructorProvider);
+    final instructor = instructors.firstWhere((i) => i.id == slot.instructorId, orElse: () => Instructor(name: '', rank: ''));
+    if (instructor.name.isEmpty) return false;
+
+    return !instructor.isQualified(slot.eoCode!);
   }
 
   bool _checkForInstructorConflict(TrainingSession session, int periodIndex, Phase currentPhase) {
@@ -278,12 +293,14 @@ class _LessonSlotCard extends StatelessWidget {
   final LessonSlot slot;
   final bool instructorConflict;
   final bool locationConflict;
+  final bool qualificationConflict;
   final VoidCallback onTap;
 
   const _LessonSlotCard({
     required this.slot,
     this.instructorConflict = false,
     this.locationConflict = false,
+    this.qualificationConflict = false,
     required this.onTap,
   });
 
@@ -328,15 +345,15 @@ class _LessonSlotCard extends StatelessWidget {
                           slot.eoCode ?? '',
                           style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
                         ),
-                        if (instructorConflict || locationConflict)
+                        if (instructorConflict || locationConflict || qualificationConflict)
                           Tooltip(
-                            message: instructorConflict 
-                                ? 'Instructor Conflict!' 
-                                : 'Location Conflict!',
+                            message: qualificationConflict
+                                ? 'Instructor not qualified for this EO!'
+                                : (instructorConflict ? 'Instructor Conflict!' : 'Location Conflict!'),
                             child: Icon(
-                              LucideIcons.alertTriangle, 
+                              qualificationConflict ? LucideIcons.shieldAlert : LucideIcons.alertTriangle, 
                               size: 12, 
-                              color: instructorConflict ? Colors.redAccent : Colors.orangeAccent
+                              color: qualificationConflict ? AppTheme.gold : (instructorConflict ? Colors.redAccent : Colors.orangeAccent)
                             ),
                           ),
                       ],

@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../application/instructor_controller.dart';
 import '../domain/instructor.dart';
+import '../../lessons/domain/lesson.dart';
+import '../../calendar/domain/training_session.dart';
+import '../../calendar/application/training_controller.dart';
 import '../../../theme/app_theme.dart';
 import '../../../shared/widgets/glass_container.dart';
 
@@ -129,6 +132,73 @@ class InstructorRegistryScreen extends ConsumerWidget {
   }
 }
 
+void _showInstructorQualifications(BuildContext context, WidgetRef ref, Instructor instructor) {
+  final selectedElement = ref.read(trainingProvider).selectedElement;
+  
+  showDialog(
+    context: context,
+    builder: (context) => Consumer(
+      builder: (context, ref, _) {
+        // Re-fetch current instructor from provider to get updated qualifications
+        final currentInstructor = ref.watch(instructorProvider).firstWhere((i) => i.id == instructor.id);
+        
+        return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: Text('QUALIFICATIONS: ${currentInstructor.name.toUpperCase()}'),
+          content: SizedBox(
+            width: 500,
+            child: DefaultTabController(
+              length: Phase.values.length,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TabBar(
+                    isScrollable: true,
+                    labelStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    indicatorColor: AppTheme.gold,
+                    labelColor: AppTheme.gold,
+                    unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                    tabs: Phase.values.map((p) => Tab(text: p.getLabel(selectedElement).toUpperCase())).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 400,
+                    child: TabBarView(
+                      children: Phase.values.map((p) {
+                        final lessons = LessonLibrary.getLessonsForPhase(p, element: selectedElement);
+                        return ListView.builder(
+                          itemCount: lessons.length,
+                          itemBuilder: (context, i) {
+                            final lesson = lessons[i];
+                            final isQualified = currentInstructor.isQualified(lesson.code);
+                            return CheckboxListTile(
+                              title: Text(lesson.code, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                              subtitle: Text(lesson.title, style: const TextStyle(fontSize: 10)),
+                              value: isQualified,
+                              activeColor: AppTheme.gold,
+                              checkColor: AppTheme.black,
+                              onChanged: (_) {
+                                ref.read(instructorProvider.notifier).toggleQualification(currentInstructor.id, lesson.code);
+                              },
+                            );
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('CLOSE')),
+          ],
+        );
+      },
+    ),
+  );
+}
+
 class _InstructorCard extends ConsumerWidget {
   final Instructor instructor;
   const _InstructorCard({required this.instructor});
@@ -159,6 +229,11 @@ class _InstructorCard extends ConsumerWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            IconButton(
+              icon: const Icon(LucideIcons.award, size: 16, color: AppTheme.gold),
+              onPressed: () => _showInstructorQualifications(context, ref, instructor),
+              tooltip: 'Qualifications',
+            ),
             IconButton(
               icon: const Icon(LucideIcons.edit2, size: 16),
               onPressed: () => const InstructorRegistryScreen()._showInstructorDialog(context, ref, instructor),

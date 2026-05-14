@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/training_session.dart';
+import '../../lessons/domain/lesson.dart';
 import 'training_storage.dart';
 
 class TrainingState {
@@ -41,22 +43,29 @@ class TrainingController extends StateNotifier<TrainingState> {
 
   Future<void> _loadAndInitialize() async {
     state = state.copyWith(isLoading: true);
-    final savedSessions = await TrainingStorage.loadSessions();
-    final savedElement = await TrainingStorage.loadElement();
-    
-    if (savedSessions != null && savedSessions.isNotEmpty) {
-      final first = savedSessions.first;
-      final year = first.date.month >= 9 ? first.date.year : first.date.year - 1;
-      state = state.copyWith(
-        sessions: savedSessions, 
-        academicYear: year, 
-        paradeWeekday: first.date.weekday,
-        selectedElement: savedElement,
-        isLoading: false,
-      );
-    } else {
+    try {
+      final savedSessions = await TrainingStorage.loadSessions();
+      final savedElement = await TrainingStorage.loadElement();
+      
+      if (savedSessions != null && savedSessions.isNotEmpty) {
+        final first = savedSessions.first;
+        final year = first.date.month >= 9 ? first.date.year : first.date.year - 1;
+        state = state.copyWith(
+          sessions: savedSessions, 
+          academicYear: year, 
+          paradeWeekday: first.date.weekday,
+          selectedElement: savedElement,
+          isLoading: false,
+        );
+      } else {
+        _initializeYear(state.academicYear, state.paradeWeekday);
+        state = state.copyWith(selectedElement: savedElement, isLoading: false);
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error loading saved sessions: $e');
       _initializeYear(state.academicYear, state.paradeWeekday);
-      state = state.copyWith(selectedElement: savedElement, isLoading: false);
+      state = state.copyWith(isLoading: false);
     }
   }
 
@@ -111,6 +120,128 @@ class TrainingController extends StateNotifier<TrainingState> {
         }
         return s;
       }).toList(),
+    );
+    _save();
+  }
+
+  void clearAllLessons() {
+    final cleared = state.sessions.map((session) {
+      final clearedMatrix = session.matrix.map((phase, slots) {
+        return MapEntry(
+          phase,
+          slots.map((_) => const LessonSlot()).toList(),
+        );
+      });
+      return session.copyWith(matrix: clearedMatrix);
+    }).toList();
+    state = state.copyWith(sessions: cleared);
+    _save();
+  }
+
+  void batchAutoPlan() {
+    var newSessions = List<TrainingSession>.from(state.sessions);
+    final element = state.selectedElement;
+
+    // Build a queue of remaining periods to plan, keyed by Phase.
+    // Each entry is a lesson that needs one period slot filled.
+    final Map<Phase, List<Lesson>> queues = {};
+
+    for (var phase in Phase.values) {
+      final mandatoryLessons = LessonLibrary.getLessonsForPhase(phase, element: element)
+          .where((l) => l.isMandatory && l.category == 'Fundamental')
+          .toList();
+
+      final List<Lesson> queue = [];
+      for (var lesson in mandatoryLessons) {
+        int plannedCount = 0;
+        for (var session in newSessions) {
+          plannedCount += (session.matrix[phase] ?? []).where((s) => s.eoCode == lesson.code).length;
+        }
+        final remaining = lesson.periods - plannedCount;
+        for (int i = 0; i < remaining; i++) {
+          queue.add(lesson);
+        }
+      }
+      if (queue.isNotEmpty) queues[phase] = queue;
+    }
+
+    if (queues.isEmpty) return;
+
+    // Distribute by dealing one period per Phase per session (round-robin).
+    // This ensures no single subject dominates consecutive nights.
+    final phases = queues.keys.toList();
+    int phaseIndex = 0; // which Phase we try to deal next
+
+    for (int sIdx = 0; sIdx < newSessions.length; sIdx++) {
+      // Check if any lessons remain at all
+      if (queues.values.every((q) => q.isEmpty)) break;
+
+      var session = newSessions[sIdx];
+      var matrix = Map<Phase, List<LessonSlot>>.from(session.matrix);
+      bool sessionModified = false;
+
+      // Find empty slot count for this session
+      int totalEmptySlots = 0;
+      for (var phase in phases) {
+        totalEmptySlots += (matrix[phase] ?? []).where((s) => s.isEmpty).length;
+      }
+      if (totalEmptySlots == 0) continue;
+
+      // Deal one lesson from each phase into this session, rotating
+      // through phases so we never place the same phase in back-to-back slots.
+      int dealtThisSession = 0;
+      int attempts = 0;
+      final maxAttempts = phases.length * 2;
+
+      while (dealtThisSession < totalEmptySlots && attempts < maxAttempts) {
+        // Find next phase with remaining lessons
+        Phase? targetPhase;
+        for (int i = 0; i < phases.length; i++) {
+          final candidate = phases[(phaseIndex + i) % phases.length];
+          if ((queues[candidate]?.isNotEmpty ?? false)) {
+            final slots = matrix[candidate] ?? [];
+            if (slots.any((s) => s.isEmpty)) {
+              targetPhase = candidate;
+              phaseIndex = (phaseIndex + i + 1) % phases.length;
+              break;
+            }
+          }
+        }
+
+        if (targetPhase == null) break;
+
+        final queue = queues[targetPhase]!;
+        final slots = List<LessonSlot>.from(matrix[targetPhase] ?? []);
+        final emptyIdx = slots.indexWhere((s) => s.isEmpty);
+
+        if (emptyIdx != -1 && queue.isNotEmpty) {
+          final lesson = queue.removeAt(0);
+          slots[emptyIdx] = LessonSlot(eoCode: lesson.code, title: lesson.title);
+          matrix[targetPhase] = slots;
+          sessionModified = true;
+          dealtThisSession++;
+        }
+
+        attempts++;
+      }
+
+      if (sessionModified) {
+        newSessions[sIdx] = session.copyWith(matrix: matrix);
+      }
+    }
+
+    state = state.copyWith(sessions: newSessions);
+    _save();
+  }
+
+  void moveSession(String sessionId, DateTime newDate) {
+    state = state.copyWith(
+      sessions: state.sessions.map((s) {
+        if (s.id == sessionId) {
+          return s.copyWith(date: newDate);
+        }
+        return s;
+      }).toList()..sort((a, b) => a.date.compareTo(b.date)),
     );
     _save();
   }

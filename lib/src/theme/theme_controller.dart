@@ -15,16 +15,16 @@ class ThemeController extends StateNotifier<AppThemeMode> {
   void _load() {
     final saved = _prefs.getString(_key);
     if (saved != null) {
-      state = AppThemeMode.values.firstWhere(
-        (e) => e.name == saved,
-        orElse: () => AppThemeMode.system,
-      );
+    state = AppThemeMode.values.firstWhere(
+      (e) => e.toString().split('.').last == saved || e.toString() == saved,
+      orElse: () => AppThemeMode.system,
+    );
     }
   }
 
   void setTheme(AppThemeMode mode) {
     state = mode;
-    _prefs.setString(_key, mode.name);
+    _prefs.setString(_key, mode.toString());
   }
 
   ThemeMode get themeMode {

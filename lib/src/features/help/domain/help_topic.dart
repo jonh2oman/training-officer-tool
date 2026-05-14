@@ -32,8 +32,18 @@ const List<HelpTopic> helpTopics = [
     content: 'The tool supports four training phases. Each phase has its own mandatory and complementary lessons. The progress for each phase is tracked independently.',
   ),
   HelpTopic(
-    title: 'Exporting PDF',
-    category: 'Reporting',
-    content: 'In the Planning Matrix screen, click the download icon in the top right to generate a Routine Order PDF for that training session.',
+    title: 'Smart Auto-Plan',
+    category: 'Planning',
+    content: 'The Auto-Plan tool distributes remaining Mandatory Fundamental lessons across empty slots. It uses a round-robin algorithm to interleave subjects, ensuring that different topics are taught on consecutive nights for a better training experience.',
+  ),
+  HelpTopic(
+    title: 'Backup & Restore',
+    category: 'Data',
+    content: 'You can download a full backup of your training data from the Dashboard. On the web, this will trigger a direct download of a .json file. To restore, simply upload that same file using the "Import" tool.',
+  ),
+  HelpTopic(
+    title: 'Resetting the Schedule',
+    category: 'Calendar',
+    content: 'If you want to start fresh or re-run the Auto-Plan, use the "Clear All Lessons" tool in the Auto-Plan menu. This wipes all planned periods while keeping your session dates and parade nights intact.',
   ),
 ];

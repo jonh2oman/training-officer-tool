@@ -207,7 +207,7 @@ class DashboardScreen extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                ref.watch(trainingProvider).selectedElement.name.toUpperCase() + ' BRANCH',
+                ref.watch(trainingProvider).selectedElement.label.toUpperCase() + ' BRANCH',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
@@ -283,11 +283,20 @@ class DashboardScreen extends ConsumerWidget {
                 subtitle: const Text('Save your current data to a file'),
                 onTap: () async {
                   Navigator.pop(context);
-                  await BackupService.exportBackup();
+                  final success = await BackupService.exportBackup();
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Backup exported successfully')),
-                    );
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Backup exported successfully')),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No data found to backup. Plan some sessions first!'),
+                          backgroundColor: AppTheme.weekendColor,
+                        ),
+                      );
+                    }
                   }
                 },
               ),

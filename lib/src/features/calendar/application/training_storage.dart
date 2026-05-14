@@ -27,14 +27,16 @@ class TrainingStorage {
 
   static Future<void> saveElement(CadetElement element) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_elementKey, element.name);
+    await prefs.setString(_elementKey, element.toString());
   }
 
   static Future<CadetElement> loadElement() async {
     final prefs = await SharedPreferences.getInstance();
     final name = prefs.getString(_elementKey);
+    if (name == null) return CadetElement.sea;
+    
     return CadetElement.values.firstWhere(
-      (e) => e.name == name,
+      (e) => e.toString() == name || e.name == name,
       orElse: () => CadetElement.sea,
     );
   }

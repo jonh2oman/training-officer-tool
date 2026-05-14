@@ -21,6 +21,20 @@ class ChangelogScreen extends StatelessWidget {
         children: [
           _buildVersion(
             context,
+            '1.1.0',
+            'May 14, 2026',
+            [
+              'Smart Auto-Plan: Interleaved subject distribution across training nights.',
+              'Backup & Restore: Cross-platform JSON backup with web download support.',
+              'Stability Patch: Resolved critical enum-based crashes on Flutter Web.',
+              'Reset Tool: New "Clear All Lessons" feature for rapid schedule iteration.',
+              'UI Polish: Improved icon visibility and snackbar feedback.',
+            ],
+            isLatest: true,
+          ),
+          const SizedBox(height: 24),
+          _buildVersion(
+            context,
             '1.0.1',
             'May 13, 2026',
             [
@@ -30,7 +44,6 @@ class ChangelogScreen extends StatelessWidget {
               'Multi-Theme Support: Light, Dark, Sea, and System themes.',
               'Help Center: Searchable documentation system.',
             ],
-            isLatest: true,
           ),
           const SizedBox(height: 24),
           _buildVersion(
