@@ -66,7 +66,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
       child: Column(
         children: [
           _buildHandle(),
-          _buildHeader(),
+          _buildHeader(trainingState),
           _buildCategoryTabs(),
           _buildSearchBar(),
           Expanded(
@@ -107,7 +107,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(dynamic trainingState) {
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Row(

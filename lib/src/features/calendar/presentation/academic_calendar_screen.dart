@@ -245,7 +245,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
       case ViewType.list:
         return _buildListView(groupedSessions);
       case ViewType.calendar:
-        return _buildCalendarView(trainingState.sessions);
+        return _buildCalendarView(trainingState);
       case ViewType.board:
         return _buildBoardView(groupedSessions);
       case ViewType.dashboard:
@@ -286,7 +286,8 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
     );
   }
 
-  Widget _buildCalendarView(List<TrainingSession> sessions) {
+  Widget _buildCalendarView(dynamic trainingState) {
+    final sessions = trainingState.sessions;
     final Map<DateTime, TrainingSession> dateMap = {
       for (var s in sessions) DateTime(s.date.year, s.date.month, s.date.day): s
     };
@@ -296,7 +297,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
       child: Column(
         children: [
           for (int m = 9; m <= 18; m++) ...[
-            _buildMonthGrid(m > 12 ? m - 12 : m, m > 12 ? 2027 : 2026, dateMap),
+            _buildMonthGrid(m > 12 ? m - 12 : m, m > 12 ? 2027 : 2026, dateMap, trainingState),
             const SizedBox(height: 48),
           ],
         ],
@@ -304,7 +305,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
     );
   }
 
-  Widget _buildMonthGrid(int month, int year, Map<DateTime, TrainingSession> dateMap) {
+  Widget _buildMonthGrid(int month, int year, Map<DateTime, TrainingSession> dateMap, dynamic trainingState) {
     final firstDay = DateTime(year, month, 1);
     final daysInMonth = DateUtils.getDaysInMonth(year, month);
     final offset = firstDay.weekday % 7;

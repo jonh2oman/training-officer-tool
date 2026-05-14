@@ -83,6 +83,7 @@ class TrainingSession {
   final String id;
   final DateTime date;
   final SessionType type;
+  final String? description;
   // Administrative details for Routine Orders
   final String? dutyOfficer;
   final String? dutyNCO;
@@ -124,6 +125,15 @@ class TrainingSession {
   }
 
   int get numPeriods => type == SessionType.paradeNight ? 3 : 9;
+
+  bool get isFullyPlanned {
+    for (var list in matrix.values) {
+      for (var slot in list) {
+        if (slot.isEmpty) return false;
+      }
+    }
+    return true;
+  }
 
   TrainingSession copyWith({
     DateTime? date,

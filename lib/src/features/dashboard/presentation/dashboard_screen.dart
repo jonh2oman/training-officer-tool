@@ -7,6 +7,8 @@ import '../../../theme/theme_controller.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/element_selector_dialog.dart';
 import '../application/backup_service.dart';
+import '../../calendar/application/training_controller.dart';
+import '../../calendar/domain/training_session.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -50,7 +52,7 @@ class DashboardScreen extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 32),
-                  _buildHeader(context),
+                  _buildHeader(context, ref),
                   const SizedBox(height: 48),
                   Text(
                     'MAIN MENU',
@@ -165,7 +167,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
