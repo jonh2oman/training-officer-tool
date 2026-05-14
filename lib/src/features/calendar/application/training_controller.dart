@@ -9,6 +9,7 @@ class TrainingState {
   final int academicYear;
   final int paradeWeekday; // 1 = Monday, 7 = Sunday
   final CadetElement selectedElement;
+  final CalendarMode calendarMode;
   final bool isLoading;
 
   TrainingState({
@@ -16,6 +17,7 @@ class TrainingState {
     this.academicYear = 2026,
     this.paradeWeekday = 2, // Default to Tuesday
     this.selectedElement = CadetElement.sea,
+    this.calendarMode = CalendarMode.academic,
     this.isLoading = false,
   });
 
@@ -24,6 +26,7 @@ class TrainingState {
     int? academicYear,
     int? paradeWeekday,
     CadetElement? selectedElement,
+    CalendarMode? calendarMode,
     bool? isLoading,
   }) {
     return TrainingState(
@@ -31,6 +34,7 @@ class TrainingState {
       academicYear: academicYear ?? this.academicYear,
       paradeWeekday: paradeWeekday ?? this.paradeWeekday,
       selectedElement: selectedElement ?? this.selectedElement,
+      calendarMode: calendarMode ?? this.calendarMode,
       isLoading: isLoading ?? this.isLoading,
     );
   }
@@ -46,6 +50,7 @@ class TrainingController extends StateNotifier<TrainingState> {
     try {
       final savedSessions = await TrainingStorage.loadSessions();
       final savedElement = await TrainingStorage.loadElement();
+      final savedMode = await TrainingStorage.loadCalendarMode();
       
       if (savedSessions != null && savedSessions.isNotEmpty) {
         final first = savedSessions.first;
@@ -55,36 +60,52 @@ class TrainingController extends StateNotifier<TrainingState> {
           academicYear: year, 
           paradeWeekday: first.date.weekday,
           selectedElement: savedElement,
+          calendarMode: savedMode,
           isLoading: false,
         );
       } else {
-        _initializeYear(state.academicYear, state.paradeWeekday);
-        state = state.copyWith(selectedElement: savedElement, isLoading: false);
+        _initializeYear(state.academicYear, state.paradeWeekday, savedMode);
+        state = state.copyWith(selectedElement: savedElement, calendarMode: savedMode, isLoading: false);
       }
     } catch (e) {
       // ignore: avoid_print
       print('Error loading saved sessions: $e');
-      _initializeYear(state.academicYear, state.paradeWeekday);
+      _initializeYear(state.academicYear, state.paradeWeekday, state.calendarMode);
       state = state.copyWith(isLoading: false);
     }
   }
 
-  void _initializeYear(int startYear, int weekday) {
-    final startDate = DateTime(startYear, 9, 1);
-    final endDate = DateTime(startYear + 1, 6, 30);
+  void _initializeYear(int startYear, int weekday, [CalendarMode? mode]) {
+    final activeMode = mode ?? state.calendarMode;
+    final DateTime startDate;
+    final DateTime endDate;
+
+    if (activeMode == CalendarMode.academic) {
+      startDate = DateTime(startYear, 9, 1);
+      endDate = DateTime(startYear + 1, 6, 30);
+    } else {
+      startDate = DateTime(startYear, 1, 1);
+      endDate = DateTime(startYear, 12, 31);
+    }
 
     final List<TrainingSession> sessions = [];
     DateTime current = startDate;
 
-    while (current.isBefore(endDate)) {
+    while (current.isBefore(endDate.add(const Duration(days: 1)))) {
       if (current.weekday == weekday) {
         sessions.add(TrainingSession(date: current, type: SessionType.paradeNight));
       }
       current = current.add(const Duration(days: 1));
     }
 
-    state = state.copyWith(sessions: sessions, academicYear: startYear, paradeWeekday: weekday);
+    state = state.copyWith(
+      sessions: sessions, 
+      academicYear: startYear, 
+      paradeWeekday: weekday,
+      calendarMode: activeMode,
+    );
     _save();
+    TrainingStorage.saveCalendarMode(activeMode);
   }
 
   void setAcademicYear(int year) {
@@ -93,6 +114,10 @@ class TrainingController extends StateNotifier<TrainingState> {
 
   void setParadeWeekday(int weekday) {
     _initializeYear(state.academicYear, weekday);
+  }
+
+  void setCalendarMode(CalendarMode mode) {
+    _initializeYear(state.academicYear, state.paradeWeekday, mode);
   }
 
   void setElement(CadetElement element) {

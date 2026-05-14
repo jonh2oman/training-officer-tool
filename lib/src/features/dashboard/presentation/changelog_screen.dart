@@ -21,6 +21,19 @@ class ChangelogScreen extends StatelessWidget {
         children: [
           _buildVersion(
             context,
+            '1.2.0',
+            'May 14, 2026',
+            [
+              'Calendar Modes: Toggle between Academic Year (Sep-Jun) and Full Year (Jan-Dec).',
+              'Experimental Label: Marked Auto-Plan as experimental while logic is refined.',
+              'Smart Persistence: Remembers your preferred calendar view across sessions.',
+              'UI Header Refresh: New toggle controls for cleaner navigation.',
+            ],
+            isLatest: true,
+          ),
+          const SizedBox(height: 24),
+          _buildVersion(
+            context,
             '1.1.0',
             'May 14, 2026',
             [
@@ -30,7 +43,6 @@ class ChangelogScreen extends StatelessWidget {
               'Reset Tool: New "Clear All Lessons" feature for rapid schedule iteration.',
               'UI Polish: Improved icon visibility and snackbar feedback.',
             ],
-            isLatest: true,
           ),
           const SizedBox(height: 24),
           _buildVersion(

@@ -6,6 +6,8 @@ enum SessionType {
   weekend,
 }
 
+enum CalendarMode { academic, full }
+
 enum Phase {
   level1,
   level2,

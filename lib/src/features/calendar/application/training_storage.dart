@@ -40,4 +40,20 @@ class TrainingStorage {
       orElse: () => CadetElement.sea,
     );
   }
+
+  static Future<void> saveCalendarMode(CalendarMode mode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('calendar_mode', mode.name);
+  }
+
+  static Future<CalendarMode> loadCalendarMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    final name = prefs.getString('calendar_mode');
+    if (name == null) return CalendarMode.academic;
+    
+    return CalendarMode.values.firstWhere(
+      (e) => e.name == name,
+      orElse: () => CalendarMode.academic,
+    );
+  }
 }

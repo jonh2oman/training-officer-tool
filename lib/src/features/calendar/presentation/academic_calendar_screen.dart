@@ -45,29 +45,68 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
           children: [
             Column(
               children: [
-                DropdownButton<int>(
-                  value: trainingState.academicYear,
-                  dropdownColor: Theme.of(context).colorScheme.surface,
-                  underline: const SizedBox(),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                  icon: Icon(LucideIcons.chevronDown, size: 16, color: Theme.of(context).colorScheme.primary),
-                  onChanged: (year) {
-                    if (year != null) {
-                      ref.read(trainingProvider.notifier).setAcademicYear(year);
-                    }
-                  },
-                  items: [2024, 2025, 2026, 2027, 2028].map((year) {
-                    return DropdownMenuItem(
-                      value: year,
-                      child: Text('ACADEMIC YEAR $year-${year + 1}'),
-                    );
-                  }).toList(),
+                Row(
+                  children: [
+                    DropdownButton<int>(
+                      value: trainingState.academicYear,
+                      dropdownColor: Theme.of(context).colorScheme.surface,
+                      underline: const SizedBox(),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      icon: Icon(LucideIcons.chevronDown, size: 16, color: Theme.of(context).colorScheme.primary),
+                      onChanged: (year) {
+                        if (year != null) {
+                          ref.read(trainingProvider.notifier).setAcademicYear(year);
+                        }
+                      },
+                      items: [2024, 2025, 2026, 2027, 2028].map((year) {
+                        return DropdownMenuItem(
+                          value: year,
+                          child: Text(trainingState.calendarMode == CalendarMode.academic 
+                            ? 'ACADEMIC YEAR $year-${year + 1}' 
+                            : 'CALENDAR YEAR $year'),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(width: 16),
+                    Container(
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: SegmentedButton<CalendarMode>(
+                        segments: const [
+                          ButtonSegment(
+                            value: CalendarMode.academic,
+                            label: Text('ACADEMIC', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                          ),
+                          ButtonSegment(
+                            value: CalendarMode.full,
+                            label: Text('FULL YEAR', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                        selected: {trainingState.calendarMode},
+                        onSelectionChanged: (modes) {
+                          ref.read(trainingProvider.notifier).setCalendarMode(modes.first);
+                        },
+                        showSelectedIcon: false,
+                        style: SegmentedButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          backgroundColor: Colors.transparent,
+                          selectedBackgroundColor: Theme.of(context).colorScheme.primary,
+                          selectedForegroundColor: Theme.of(context).colorScheme.onPrimary,
+                          side: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       'CORPS PARADES ON: ',
@@ -134,13 +173,13 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'AUTO-PLAN',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1),
+                        'AUTO-PLAN (EXPERIMENTAL)',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1, color: Colors.amber),
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'Automatically distributes remaining Mandatory Fundamental lessons across empty slots, interleaved across subjects so no single topic dominates consecutive nights.',
-                        style: TextStyle(fontSize: 13),
+                        'NOTE: This feature is currently in Beta. It automatically distributes remaining Mandatory Fundamental lessons across empty slots, interleaved across subjects.',
+                        style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic),
                       ),
                       SizedBox(height: 16),
                       Text(

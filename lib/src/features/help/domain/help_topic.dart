@@ -32,9 +32,14 @@ const List<HelpTopic> helpTopics = [
     content: 'The tool supports four training phases. Each phase has its own mandatory and complementary lessons. The progress for each phase is tracked independently.',
   ),
   HelpTopic(
-    title: 'Smart Auto-Plan',
+    title: 'Smart Auto-Plan (Experimental)',
     category: 'Planning',
-    content: 'The Auto-Plan tool distributes remaining Mandatory Fundamental lessons across empty slots. It uses a round-robin algorithm to interleave subjects, ensuring that different topics are taught on consecutive nights for a better training experience.',
+    content: 'NOTE: This feature is currently experimental. The Auto-Plan tool distributes remaining Mandatory Fundamental lessons across empty slots using a round-robin algorithm. We recommend reviewing the results carefully as the logic is still being refined.',
+  ),
+  HelpTopic(
+    title: 'Calendar View Modes',
+    category: 'Calendar',
+    content: 'You can now switch between ACADEMIC (Sep-Jun) and FULL YEAR (Jan-Dec) modes using the toggle in the calendar header. This is useful for planning summer training or specialized courses outside the normal school year.',
   ),
   HelpTopic(
     title: 'Backup & Restore',
