@@ -1,3 +1,5 @@
+import 'package:lucide_icons/lucide_icons.dart';
+
 class HelpTopic {
   final String title;
   final String category;
@@ -23,8 +25,6 @@ class WorkflowStep {
     required this.icon,
   });
 }
-
-import 'package:lucide_icons/lucide_icons.dart';
 
 const List<HelpTopic> helpTopics = [
   HelpTopic(
