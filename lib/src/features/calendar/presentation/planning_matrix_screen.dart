@@ -72,7 +72,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: Icon(LucideIcons.download, color: Theme.of(context).colorScheme.primary),
-            onPressed: () => PdfService.generateRoutineOrder(session),
+            onPressed: () => PdfService.generateRoutineOrder(session, trainingState.selectedElement),
           ),
         ],
       ),
@@ -104,7 +104,7 @@ class PlanningMatrixScreen extends ConsumerWidget {
           for (var phase in Phase.values)
             Expanded(
               child: Text(
-                phase.label.toUpperCase(),
+                phase.getLabel(trainingState.selectedElement).toUpperCase(),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
               ),

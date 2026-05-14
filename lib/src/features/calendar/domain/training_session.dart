@@ -7,13 +7,29 @@ enum SessionType {
 }
 
 enum Phase {
-  phase1('Phase 1'),
-  phase2('Phase 2'),
-  phase3('Phase 3'),
-  phase4('Phase 4');
+  level1,
+  level2,
+  level3,
+  level4;
 
-  final String label;
-  const Phase(this.label);
+  String getLabel(CadetElement element) {
+    switch (element) {
+      case CadetElement.sea:
+        return 'Phase ${index + 1}';
+      case CadetElement.army:
+        switch (this) {
+          case level1: return 'Green Star';
+          case level2: return 'Red Star';
+          case level3: return 'Silver Star';
+          case level4: return 'Gold Star';
+        }
+      case CadetElement.air:
+        return 'Level ${index + 1}';
+    }
+  }
+
+  // Legacy support for basic label if needed
+  String get label => 'Level ${index + 1}';
 }
 
 enum CadetElement {

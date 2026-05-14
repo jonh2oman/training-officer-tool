@@ -100,7 +100,7 @@ class AppTheme {
         bodyLarge: TextStyle(color: textPrimary),
         bodyMedium: TextStyle(color: textPrimary.withOpacity(0.7)),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: CardTheme(
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(

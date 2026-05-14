@@ -7,8 +7,9 @@ import '../../../shared/widgets/glass_container.dart';
 
 class ProgressDashboardScreen extends StatelessWidget {
   final List<TrainingSession> sessions;
+  final CadetElement selectedElement;
 
-  const ProgressDashboardScreen({super.key, required this.sessions});
+  const ProgressDashboardScreen({super.key, required this.sessions, required this.selectedElement});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,7 @@ class ProgressDashboardScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             final phase = Phase.values[index];
             final stats = phaseStats[phase]!;
-            return _PhaseProgressCard(phase: phase, stats: stats);
+            return _PhaseProgressCard(phase: phase, stats: stats, selectedElement: selectedElement);
           },
         ),
         const SizedBox(height: 32),
@@ -54,8 +55,9 @@ class ProgressDashboardScreen extends StatelessWidget {
         const SizedBox(height: 16),
         ...Phase.values.map((phase) => _PhaseDetailSection(
           phase: phase,
-          lessons: LessonLibrary.getLessonsForPhase(phase).where((l) => l.isMandatory).toList(),
+          lessons: LessonLibrary.getLessonsForPhase(phase, element: selectedElement).where((l) => l.isMandatory).toList(),
           scheduledCounts: _getScheduledCountsForPhase(phase),
+          selectedElement: selectedElement,
         )),
       ],
     );
@@ -117,8 +119,9 @@ class _PhaseStats {
 class _PhaseProgressCard extends StatelessWidget {
   final Phase phase;
   final _PhaseStats stats;
+  final CadetElement selectedElement;
 
-  const _PhaseProgressCard({required this.phase, required this.stats});
+  const _PhaseProgressCard({required this.phase, required this.stats, required this.selectedElement});
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +152,7 @@ class _PhaseProgressCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            phase.label.toUpperCase(),
+            phase.getLabel(selectedElement).toUpperCase(),
             style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
           ),
           const SizedBox(height: 4),
@@ -173,11 +176,13 @@ class _PhaseDetailSection extends StatelessWidget {
   final Phase phase;
   final List<Lesson> lessons;
   final Map<String, int> scheduledCounts;
+  final CadetElement selectedElement;
 
   const _PhaseDetailSection({
     required this.phase,
     required this.lessons,
     required this.scheduledCounts,
+    required this.selectedElement,
   });
 
   @override
@@ -188,7 +193,7 @@ class _PhaseDetailSection extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Text(
-            phase.label,
+            phase.getLabel(selectedElement),
             style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
           ),
         ),

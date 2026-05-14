@@ -126,7 +126,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
                   ),
                 ),
                 Text(
-                  widget.phase.label.toUpperCase(),
+                  widget.phase.getLabel(ref.watch(trainingProvider).selectedElement).toUpperCase(),
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ],

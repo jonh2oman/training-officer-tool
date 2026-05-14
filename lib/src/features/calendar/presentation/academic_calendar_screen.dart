@@ -235,7 +235,7 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
       }
 
       final title = 'Training Plan (${DateFormat('dd MMM').format(picked.start)} - ${DateFormat('dd MMM').format(picked.end)})';
-      await PdfService.generateTrainingPlan(filteredSessions, title);
+      await PdfService.generateTrainingPlan(filteredSessions, title, trainingState.selectedElement);
     }
   }
 
@@ -248,12 +248,12 @@ class _AcademicCalendarScreenState extends ConsumerState<AcademicCalendarScreen>
       case ViewType.board:
         return _buildBoardView(groupedSessions);
       case ViewType.dashboard:
-        return _buildDashboardView(trainingState.sessions);
+        return _buildDashboardView(trainingState.sessions, trainingState.selectedElement);
     }
   }
 
-  Widget _buildDashboardView(List<TrainingSession> sessions) {
-    return ProgressDashboardScreen(sessions: sessions);
+  Widget _buildDashboardView(List<TrainingSession> sessions, CadetElement selectedElement) {
+    return ProgressDashboardScreen(sessions: sessions, selectedElement: selectedElement);
   }
 
   Widget _buildListView(Map<String, List<TrainingSession>> groupedSessions) {
