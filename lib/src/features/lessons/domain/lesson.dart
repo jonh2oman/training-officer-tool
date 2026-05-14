@@ -6,6 +6,7 @@ class Lesson {
   final Phase phase;
   final int periods;
   final bool isMandatory;
+  final List<CadetElement> elements;
   final String category; // Fundamental, Elemental, Optional
 
   const Lesson({
@@ -13,6 +14,7 @@ class Lesson {
     required this.title,
     required this.phase,
     required this.periods,
+    this.elements = CadetElement.values, // Default to all elements (Common)
     this.isMandatory = false,
     this.category = 'Fundamental',
   });
@@ -98,16 +100,21 @@ class LessonLibrary {
     Lesson(code: 'C125.02', title: 'Participate in a Nautical Training Weekend', phase: Phase.phase1, periods: 9, isMandatory: true, category: 'Elemental'),
 
     // Phase 1 Elemental (Complementary)
-    Lesson(code: 'C121.01', title: 'West Country Whipping', phase: Phase.phase1, periods: 1, category: 'Elemental'),
-    Lesson(code: 'C121.02', title: 'Sailmaker\'s Whipping', phase: Phase.phase1, periods: 2, category: 'Elemental'),
-    Lesson(code: 'C121.03', title: 'Complete a Rolling Hitch', phase: Phase.phase1, periods: 1, category: 'Elemental'),
-    Lesson(code: 'C121.04', title: 'Complete a Marlin Hitch', phase: Phase.phase1, periods: 1, category: 'Elemental'),
-    Lesson(code: 'C123.01', title: 'Read the 24-hour Clock', phase: Phase.phase1, periods: 1, category: 'Elemental'),
-    Lesson(code: 'C123.02', title: 'Recite the Phonetic Alphabet', phase: Phase.phase1, periods: 2, category: 'Elemental'),
-    Lesson(code: 'C123.03', title: 'Participate in a Semaphore Exercise', phase: Phase.phase1, periods: 5, category: 'Elemental'),
-    Lesson(code: 'C123.04', title: 'Ring the Ship\'s Bell', phase: Phase.phase1, periods: 1, category: 'Elemental'),
-    Lesson(code: 'M124.02', title: 'Participate in a Sail Weekend', phase: Phase.phase1, periods: 18, category: 'Elemental'),
-    Lesson(code: 'C124.01', title: 'Prepare for a Sail Weekend', phase: Phase.phase1, periods: 1, category: 'Elemental'),
+    Lesson(code: 'C121.01', title: 'West Country Whipping', phase: Phase.phase1, periods: 1, category: 'Elemental', elements: [CadetElement.sea]),
+    Lesson(code: 'C121.02', title: 'Sailmaker\'s Whipping', phase: Phase.phase1, periods: 2, category: 'Elemental', elements: [CadetElement.sea]),
+    Lesson(code: 'C121.03', title: 'Complete a Rolling Hitch', phase: Phase.phase1, periods: 1, category: 'Elemental', elements: [CadetElement.sea]),
+    Lesson(code: 'C121.04', title: 'Complete a Marlin Hitch', phase: Phase.phase1, periods: 1, category: 'Elemental', elements: [CadetElement.sea]),
+    Lesson(code: 'C123.01', title: 'Read the 24-hour Clock', phase: Phase.phase1, periods: 1, category: 'Elemental', elements: [CadetElement.sea]),
+    Lesson(code: 'C123.02', title: 'Recite the Phonetic Alphabet', phase: Phase.phase1, periods: 2, category: 'Elemental', elements: [CadetElement.sea]),
+    Lesson(code: 'C123.03', title: 'Participate in a Semaphore Exercise', phase: Phase.phase1, periods: 5, category: 'Elemental', elements: [CadetElement.sea]),
+    Lesson(code: 'C123.04', title: 'Ring the Ship\'s Bell', phase: Phase.phase1, periods: 1, category: 'Elemental', elements: [CadetElement.sea]),
+    Lesson(code: 'M124.02', title: 'Participate in a Sail Weekend', phase: Phase.phase1, periods: 18, category: 'Elemental', elements: [CadetElement.sea]),
+    Lesson(code: 'C124.01', title: 'Prepare for a Sail Weekend', phase: Phase.phase1, periods: 1, category: 'Elemental', elements: [CadetElement.sea]),
+
+    // Phase 1 Elemental Placeholder (Army/Air)
+    Lesson(code: 'M120.01', title: 'Introduction to Elemental Training', phase: Phase.phase1, periods: 3, category: 'Elemental', elements: [CadetElement.army, CadetElement.air]),
+    Lesson(code: 'M231.01', title: 'Identify Aircraft Components', phase: Phase.phase1, periods: 2, category: 'Elemental', elements: [CadetElement.air]),
+    Lesson(code: 'M221.01', title: 'Perform Trekking Activities', phase: Phase.phase1, periods: 6, category: 'Elemental', elements: [CadetElement.army]),
 
     // ==========================================
     // PHASE 2
@@ -344,10 +351,10 @@ class LessonLibrary {
       Lesson(code: 'EVT-RELAY-P${p.index + 1}', title: 'Charity Relay', phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-MUSE-P${p.index + 1}', title: 'Maritime Museum Tour', phase: p, periods: 3, category: 'Optional'),
       Lesson(code: 'EVT-BARBQ-P${p.index + 1}', title: 'End-of-Year Barbecue', phase: p, periods: 3, category: 'Optional'),
-    ]).toList(),
+    ]),
   ];
 
-  static List<Lesson> getLessonsForPhase(Phase phase) {
-    return allLessons.where((l) => l.phase == phase).toList();
+  static List<Lesson> getLessonsForPhase(Phase phase, {CadetElement element = CadetElement.sea}) {
+    return allLessons.where((l) => l.phase == phase && l.elements.contains(element)).toList();
   }
 }

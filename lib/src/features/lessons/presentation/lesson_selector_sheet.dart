@@ -36,7 +36,7 @@ class _LessonSelectorSheetState extends ConsumerState<LessonSelectorSheet> {
   @override
   Widget build(BuildContext context) {
     final trainingState = ref.watch(trainingProvider);
-    final allLessons = LessonLibrary.getLessonsForPhase(widget.phase);
+    final allLessons = LessonLibrary.getLessonsForPhase(widget.phase, element: trainingState.selectedElement);
     
     // Map of EO code -> List of Dates where it is planned
     final Map<String, List<DateTime>> plannedMap = {};

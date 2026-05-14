@@ -16,6 +16,15 @@ enum Phase {
   const Phase(this.label);
 }
 
+enum CadetElement {
+  sea('Sea Cadets'),
+  army('Army Cadets'),
+  air('Air Cadets');
+
+  final String label;
+  const CadetElement(this.label);
+}
+
 class LessonSlot {
   final String? eoCode; // e.g. M103.01
   final String? title;

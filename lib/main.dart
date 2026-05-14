@@ -31,7 +31,13 @@ class MyApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Training Officer Tool',
       theme: AppTheme.lightTheme,
-      darkTheme: themeMode == AppThemeMode.sea ? AppTheme.seaTheme : AppTheme.darkTheme,
+      darkTheme: themeMode == AppThemeMode.sea 
+          ? AppTheme.seaTheme 
+          : themeMode == AppThemeMode.army 
+              ? AppTheme.armyTheme 
+              : themeMode == AppThemeMode.air 
+                  ? AppTheme.airTheme 
+                  : AppTheme.darkTheme,
       themeMode: themeNotifier.themeMode,
       routerConfig: goRouter,
       debugShowCheckedModeBanner: false,

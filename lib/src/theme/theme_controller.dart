@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum AppThemeMode { light, dark, system, sea }
+enum AppThemeMode { light, dark, system, sea, army, air }
 
 class ThemeController extends StateNotifier<AppThemeMode> {
   static const _key = 'app_theme_mode';
@@ -33,7 +33,9 @@ class ThemeController extends StateNotifier<AppThemeMode> {
         return ThemeMode.light;
       case AppThemeMode.dark:
       case AppThemeMode.sea:
-        return ThemeMode.dark; // Sea is a dark variant
+      case AppThemeMode.army:
+      case AppThemeMode.air:
+        return ThemeMode.dark; // All elemental themes are dark variants
       case AppThemeMode.system:
         return ThemeMode.system;
     }

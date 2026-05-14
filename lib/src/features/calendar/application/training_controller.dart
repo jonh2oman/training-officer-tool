@@ -6,12 +6,14 @@ class TrainingState {
   final List<TrainingSession> sessions;
   final int academicYear;
   final int paradeWeekday; // 1 = Monday, 7 = Sunday
+  final CadetElement selectedElement;
   final bool isLoading;
 
   TrainingState({
     this.sessions = const [],
     this.academicYear = 2026,
     this.paradeWeekday = 2, // Default to Tuesday
+    this.selectedElement = CadetElement.sea,
     this.isLoading = false,
   });
 
@@ -19,12 +21,14 @@ class TrainingState {
     List<TrainingSession>? sessions,
     int? academicYear,
     int? paradeWeekday,
+    CadetElement? selectedElement,
     bool? isLoading,
   }) {
     return TrainingState(
       sessions: sessions ?? this.sessions,
       academicYear: academicYear ?? this.academicYear,
       paradeWeekday: paradeWeekday ?? this.paradeWeekday,
+      selectedElement: selectedElement ?? this.selectedElement,
       isLoading: isLoading ?? this.isLoading,
     );
   }
@@ -38,20 +42,21 @@ class TrainingController extends StateNotifier<TrainingState> {
   Future<void> _loadAndInitialize() async {
     state = state.copyWith(isLoading: true);
     final savedSessions = await TrainingStorage.loadSessions();
+    final savedElement = await TrainingStorage.loadElement();
     
     if (savedSessions != null && savedSessions.isNotEmpty) {
-      // Find the most recent year and weekday from saved sessions
       final first = savedSessions.first;
       final year = first.date.month >= 9 ? first.date.year : first.date.year - 1;
       state = state.copyWith(
         sessions: savedSessions, 
         academicYear: year, 
         paradeWeekday: first.date.weekday,
+        selectedElement: savedElement,
         isLoading: false,
       );
     } else {
       _initializeYear(state.academicYear, state.paradeWeekday);
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(selectedElement: savedElement, isLoading: false);
     }
   }
 
@@ -79,6 +84,11 @@ class TrainingController extends StateNotifier<TrainingState> {
 
   void setParadeWeekday(int weekday) {
     _initializeYear(state.academicYear, weekday);
+  }
+
+  void setElement(CadetElement element) {
+    state = state.copyWith(selectedElement: element);
+    TrainingStorage.saveElement(element);
   }
 
   void addAdHocSession(DateTime date, SessionType type) {

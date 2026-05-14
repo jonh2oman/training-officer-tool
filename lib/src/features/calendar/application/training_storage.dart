@@ -4,6 +4,7 @@ import '../domain/training_session.dart';
 
 class TrainingStorage {
   static const String _key = 'training_data_v1';
+  static const String _elementKey = 'selected_cadet_element';
 
   static Future<void> saveSessions(List<TrainingSession> sessions) async {
     final prefs = await SharedPreferences.getInstance();
@@ -22,5 +23,19 @@ class TrainingStorage {
     } catch (e) {
       return null;
     }
+  }
+
+  static Future<void> saveElement(CadetElement element) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_elementKey, element.name);
+  }
+
+  static Future<CadetElement> loadElement() async {
+    final prefs = await SharedPreferences.getInstance();
+    final name = prefs.getString(_elementKey);
+    return CadetElement.values.firstWhere(
+      (e) => e.name == name,
+      orElse: () => CadetElement.sea,
+    );
   }
 }

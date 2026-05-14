@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_controller.dart';
 import '../../../shared/widgets/glass_container.dart';
+import '../../../shared/widgets/element_selector_dialog.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -84,6 +85,17 @@ class DashboardScreen extends ConsumerWidget {
                           color: AppTheme.weekendColor,
                           onTap: () => context.push('/locations'),
                         ),
+                        const SizedBox(height: 16),
+                        _DashboardCard(
+                          title: 'Element Settings',
+                          subtitle: 'Sea, Army, or Air configuration',
+                          icon: LucideIcons.shield,
+                          color: Colors.blueGrey,
+                          onTap: () => showDialog(
+                            context: context,
+                            builder: (context) => const ElementSelectorDialog(),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -110,6 +122,8 @@ class DashboardScreen extends ConsumerWidget {
           _themeIcon(context, ref, AppThemeMode.light, LucideIcons.sun, currentMode),
           _themeIcon(context, ref, AppThemeMode.dark, LucideIcons.moon, currentMode),
           _themeIcon(context, ref, AppThemeMode.sea, LucideIcons.waves, currentMode),
+          _themeIcon(context, ref, AppThemeMode.army, LucideIcons.mountain, currentMode),
+          _themeIcon(context, ref, AppThemeMode.air, LucideIcons.plane, currentMode),
           _themeIcon(context, ref, AppThemeMode.system, LucideIcons.monitor, currentMode),
         ],
       ),
