@@ -34,7 +34,6 @@ class AppTheme {
         primary: seaAccent,
         secondary: gold,
         surface: seaSurface,
-        surface: seaSurface,
       ),
     );
   }
@@ -48,7 +47,6 @@ class AppTheme {
         primary: armyGreen,
         secondary: armyTan,
         surface: Color(0xFF2E331A),
-        surface: Color(0xFF2E331A),
       ),
     );
   }
@@ -60,7 +58,6 @@ class AppTheme {
       colorScheme: const ColorScheme.dark(
         primary: Color(0xFF38BDF8), // Using a brighter blue for accent
         secondary: airSilver,
-        surface: Color(0xFF00254D),
         surface: Color(0xFF00254D),
       ),
     );
@@ -104,7 +101,7 @@ class AppTheme {
         bodyLarge: TextStyle(color: textPrimary),
         bodyMedium: TextStyle(color: textPrimary.withOpacity(0.7)),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
